@@ -32,7 +32,7 @@ import org.mouserabbit.utilities.log.Timer;
 public class Loader {
 
     // private static final Logger logger = LogManager.getLogger("HelloWorld");
-    private static String version = "Loader, Sep 21 2025 : 1.35";
+    private static String version = "Loader, Sep 21 2025 : 1.36";
     private static String _host = "localhost";
     private static int _port = 3306;
     private static String _user = "";
