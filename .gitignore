@@ -1,3 +1,4 @@
-data
-lib
-xml/mysqlparams.xml
+/data
+/lib
+/xml
+

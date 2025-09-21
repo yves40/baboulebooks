@@ -32,14 +32,14 @@ import org.mouserabbit.utilities.log.Timer;
 public class Loader {
 
     // private static final Logger logger = LogManager.getLogger("HelloWorld");
-    private static String version = "Loader, Sep 21 2025 : 1.34";
+    private static String version = "Loader, Sep 21 2025 : 1.35";
     private static String _host = "localhost";
     private static int _port = 3306;
     private static String _user = "";
     private static String _password = "";
     private static String _database = "";
     private static String _xmlparameterfile = "";
-    private static String _xceldatafile = "";
+    private static String _exceldatafile = "";
     private static Connection _dbconn = null;
     private static Logger _logger = null;
     
@@ -177,7 +177,7 @@ public class Loader {
             {
                 if (loop < args.length) {
                     recognized = true;
-                    _xceldatafile = args[++loop];
+                    _exceldatafile = args[++loop];
                 }
             }
             // Trap a bad qualifier error
@@ -197,7 +197,7 @@ public class Loader {
         if(_user.equals("")) {throw new Exception("Missing user name");}
         if(_password.equals("")) {throw new Exception("Missing password");}
         if(_database.equals("")) {throw new Exception("Missing database name");}
-        if(_xceldatafile.equals("")) {throw new Exception("Missing excel data filename : use -d qualifier");}
+        if(_exceldatafile.equals("")) {throw new Exception("Missing excel data filename : use -d qualifier");}
     }
     //---------------------------------------------------------------------------------------------------
     //   Parse an XML parameter file 
@@ -236,6 +236,11 @@ public class Loader {
                                 System.out.println( "DATABASE :  " + node.getTextContent());
                                 if(_database != "") {_logger.warn("Overriding database with xml file parameter");}
                                 _database = node.getTextContent();
+                                break;
+                    case "exceldatafile":
+                                System.out.println( "DATABASE :  " + node.getTextContent());
+                                if(_exceldatafile != "") {_logger.warn("Overriding database with xml file parameter");}
+                                _exceldatafile = node.getTextContent();
                                 break;
                     default:
                             throw new XMLParseException("XML parameter file invalid tag : [ " + node.getNodeName() + " ]");
