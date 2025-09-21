@@ -11,9 +11,10 @@
     "src\\main\\java"
   ],
   "java.project.referencedLibraries": [
-    "d:\\ALL-LIBS\\MYSQL\\mysql-connector-j-9.4.0.jar",
     "d:\\ALL-LIBS\\UTILITIES\\utilities.jar",
     "d:\\ALL-LIBS\\LOG4J\\log4j-core-2.12.4.jar",
+    "d:\\ALL-LIBS\\MYSQL\\mysql-connector-j-9.4.0.jar",
     "d:\\ALL-LIBS\\LOG4J\\log4j-api-2.12.4.jar"
   ],
+  "java.project.outputPath": "build",
 }

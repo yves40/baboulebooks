@@ -259,7 +259,7 @@ public class Loader {
         System.err.println("\t\thost, is optional and points to a server: default is localhost.");
         System.err.println("\t\tport is the mysql service port, default is 3306.");
         System.err.println("\t\tf is an axml file containing launch parameters.");
-        System.err.println("\t\td is an excel data file with separators.");
+        System.err.println("\t\td is an excel csv file.");
         System.err.println("\t\t");
     }
 }
