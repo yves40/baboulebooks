@@ -1,0 +1,7 @@
+<server>
+  <host>localhost</host>
+  <port>3306</port>
+  <user>bomerle</user>
+  <password>manager1</password>
+  <database>bomerledb</database>
+</server>

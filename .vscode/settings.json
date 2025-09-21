@@ -1,0 +1,18 @@
+{
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "java.debug.settings.onBuildFailureProceed": true,
+  "terminal.integrated.env.windows": {
+        "PATH": "c:\\windows;c:\\windows\\system32;d:\\TOOLS\\apache-ant-1.10.14\\bin\\ant;D:\\TOOLS\\Java\\jdk-24\\bin;D:\\TOOLS\\Git\\bin",
+        "ANT_HOME": "D:\\TOOLS\\apache-ant-1.10.14",
+        "CLASSPATH": ".;D:\\ALL-LIBS;D:\\ALL-BUILD",
+        "log4j2.configurationFile" : "D:\\ALL\\LAB\\GIT\\JAVA\\baboulebooks\\log4jparams.xml"
+  },
+  "java.project.sourcePaths": [
+    "src\\main\\java"
+  ],
+  "java.project.referencedLibraries": [
+    "d:\\ALL-LIBS\\LOG4J\\log4j-api-2.12.4.jar",
+    "d:\\ALL-LIBS\\UTILITIES\\utilities.jar",
+    "d:\\ALL-LIBS\\LOG4J\\log4j-core-2.12.4.jar"
+  ],
+}
