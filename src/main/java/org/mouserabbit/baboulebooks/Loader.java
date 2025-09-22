@@ -3,7 +3,15 @@ package org.mouserabbit.baboulebooks;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.Exception;
+import java.nio.file.*;
+import java.nio.file.attribute.*;
 import java.util.StringTokenizer;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -21,6 +29,7 @@ import java.sql.ResultSet;
 
 import org.mouserabbit.utilities.helpers.FileScanHelper;
 import org.mouserabbit.utilities.log.Timer;
+import org.mouserabbit.baboulebooks.FileSearch;;
 
 /**
  *
@@ -32,7 +41,7 @@ import org.mouserabbit.utilities.log.Timer;
 public class Loader {
 
     // private static final Logger logger = LogManager.getLogger("HelloWorld");
-    private static String version = "Loader, Sep 21 2025 : 1.36";
+    private static String version = "Loader, Sep 22 2025 : 1.38";
     private static String _host = "localhost";
     private static int _port = 3306;
     private static String _user = "";
@@ -40,6 +49,7 @@ public class Loader {
     private static String _database = "";
     private static String _xmlparameterfile = "";
     private static String _exceldatafile = "";
+    private static int _maxlines = 0;
     private static Connection _dbconn = null;
     private static Logger _logger = null;
     
@@ -80,17 +90,56 @@ public class Loader {
             String connectstring = "jdbc:mysql://" +  _host + ":" + _port + "/" + _database + "?" + "user=" + _user + "&password=" + _password;
             _logger.info("Trying to  " + connectstring);
             _dbconn = DriverManager.getConnection(connectstring);
+
             // Some select 
-            stmt = _dbconn.createStatement();  
-            if(stmt.execute("SELECT id, email, password,  firstname, lastname FROM users")) {
-                rs = stmt.getResultSet();
-                while (rs.next()) {
-                    int id = rs.getInt(1);
-                    String email = rs.getString(2);
-                    _logger.info("User email  [" + id + "]  " + email );
-                }                
-            }
+            // stmt = _dbconn.createStatement();  
+            // if(stmt.execute("SELECT id, email, password,  firstname, lastname FROM users")) {
+            //     rs = stmt.getResultSet();
+            //     while (rs.next()) {
+            //         int id = rs.getInt(1);
+            //         String email = rs.getString(2);
+            //         _logger.info("User email  [" + id + "]  " + email );
+            //     }                
+            // }
             // Exit
+
+            // Process input file(s)
+            // StringTokenizer linedata; // To separate line elements
+            FileScanHelper files = new FileScanHelper(_exceldatafile);
+            File oneFile = null;  
+            String line;
+            while ( files.HasMoreElements()) {
+                oneFile = files.NextFile();
+                int linecount = 0;
+                try (Scanner myReader = new Scanner(oneFile)) {
+                    while (myReader.hasNextLine()) {
+                        line = myReader.nextLine();
+                        ++linecount;
+                    }
+                    _logger.info("Processed " + oneFile.getAbsolutePath() + " : " + linecount);
+                } catch (FileNotFoundException e) {
+                    _logger.error(e.getMessage());
+                }
+            }
+
+            /*
+             * Test alternative method to scan files
+             */
+            FileSearch sfbw = new FileSearch();
+            Path path = Paths.get("data");
+            Path absolutePath = path.toAbsolutePath();          
+            try {
+                List<String> thelist = sfbw.searchWithWc(absolutePath, "glob:*.{csv}");
+                for ( int i = 0; i < thelist.size(); ++i ){
+                    _logger.info("FileSearch --- Processing " + thelist.get(i));
+                }
+            }
+            catch(FileNotFoundException fne) {
+                _logger.error(fne.getMessage());
+            }
+
+            // T E S T ===================================================================
+
             _dbconn.close();
         }
         catch (SQLException e) {
@@ -166,6 +215,12 @@ public class Loader {
                     recognized = true;
                 }
             }
+            if (args[loop].equals("-l")) {
+                if (loop < args.length) {
+                    _maxlines = Integer.parseInt(args[++loop]);
+                    recognized = true;
+                }
+            }
             if (args[loop].equals("-f"))
             {
                 if (loop < args.length) {
@@ -173,7 +228,7 @@ public class Loader {
                     _xmlparameterfile = args[++loop];
                 }
             }
-            if (args[loop].equals("-d"))
+            if (args[loop].equals("-x"))
             {
                 if (loop < args.length) {
                     recognized = true;
@@ -252,14 +307,17 @@ public class Loader {
     //   Help user with a short usage message
     //---------------------------------------------------------------------------------------------------
     private static void Usage() {
-        System.err.println("\nUsage: Loader -u user -p password -d database [ -h host ] [ -port portnumber ] [ -f parameterfile.xml ] -d exceldatafile");
-        System.err.println("\t\tuser, is the username to connect to MySQL.");
-        System.err.println("\t\tpassword, is the user password to connect to MySQL.");
-        System.err.println("\t\tdatabase, is the DB we want to connect.");
-        System.err.println("\t\thost, is optional and points to a server: default is localhost.");
-        System.err.println("\t\tport is the mysql service port, default is 3306.");
-        System.err.println("\t\tf is an axml file containing launch parameters.");
-        System.err.println("\t\td is an excel csv file.");
-        System.err.println("\t\t");
+        System.out.print("\nUsage: Loader -u user -p password -d database -x exceldatafile ");
+        System.out.println(" [ -h host ] [ -port portnumber ] [ -f parameterfile.xml ]  [ -l limit ]");
+        System.out.println("\t\t-user, is the username to connect to MySQL.");
+        System.out.println("\t\t-password, is the user password to connect to MySQL.");
+        System.out.println("\t\t-database, is the DB we want to connect.");
+        System.out.println("\t\t-host, is optional and points to a server: default is localhost.");
+        System.out.println("\t\t-port is optional is the mysql service port, default is 3306.");
+        System.out.println("\t\t-f is optional and points to an xml file containing launch parameters.");
+        System.out.println("\t\t-x is an excel csv file. Wildcards suported : *.csv");
+        System.out.println("\t\t-l maxlines is optional: stop processing input file after maxlines.");
+        System.out.println("\t\t");
     }
 }
+
