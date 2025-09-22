@@ -12,7 +12,8 @@
       "projectName": "baboulebooks_1d8d2b2f",
       "args": [
         "-f",
-        "xml/run1.xml"
+        "xml/run1.xml",
+        "-l", "15"
       ]
     }
   ]
