@@ -14,17 +14,6 @@
         "-f",
         "xml/run1.xml"
       ]
-    },
-    {
-      "type": "java",
-      "name": "Loader",
-      "request": "launch",
-      "mainClass": "org.mouserabbit.baboulebooks.Loader",
-      "projectName": "baboulebooks",
-      "args": [
-        "-f",
-        "xml/run1.xml"
-      ]
     }
   ]
 }
