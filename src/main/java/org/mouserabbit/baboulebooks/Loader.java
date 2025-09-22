@@ -104,7 +104,7 @@ public class Loader {
             // Exit
 
             // Process input file(s)
-            // StringTokenizer linedata; // To separate line elements
+            StringTokenizer linedata; // To separate line elements
             FileScanHelper files = new FileScanHelper(_exceldatafile);
             File oneFile = null;  
             String line;
@@ -113,7 +113,27 @@ public class Loader {
                 int linecount = 0;
                 try (Scanner myReader = new Scanner(oneFile)) {
                     while (myReader.hasNextLine()) {
+
+                        String location = "";
+                        String title = "";
+                        String firstname = "";
+                        String editor = "";
+                        String lastname = "";
+                        String skip = "";
+
                         line = myReader.nextLine();
+                        if(linecount != 0) {
+                            linedata = new StringTokenizer(line, ";");
+                            while(linedata.hasMoreElements()) {
+                                location = linedata.nextToken();
+                                skip = linedata.nextToken();
+                                title = linedata.nextToken();
+                                lastname = linedata.nextToken();
+                                firstname = linedata.nextToken();
+                                editor = linedata.nextToken();
+                                _logger.info( location + " ==> " + title + " : " + firstname + "." + lastname + " [" + editor + "]");
+                            }
+                        }
                         ++linecount;
                     }
                     _logger.info("Processed " + oneFile.getAbsolutePath() + " : " + linecount);
@@ -121,24 +141,8 @@ public class Loader {
                     _logger.error(e.getMessage());
                 }
             }
-
-            /*
-             * Test alternative method to scan files
-             */
-            FileSearch sfbw = new FileSearch();
-            Path path = Paths.get("data");
-            Path absolutePath = path.toAbsolutePath();          
-            try {
-                List<String> thelist = sfbw.searchWithWc(absolutePath, "glob:*.{csv}");
-                for ( int i = 0; i < thelist.size(); ++i ){
-                    _logger.info("FileSearch --- Processing " + thelist.get(i));
-                }
-            }
-            catch(FileNotFoundException fne) {
-                _logger.error(fne.getMessage());
-            }
-
-            // T E S T ===================================================================
+            // Uncomment if you want to use this new utility class ;-)
+            // AnotherMethodToScanFiles("data");
 
             _dbconn.close();
         }
@@ -318,6 +322,23 @@ public class Loader {
         System.out.println("\t\t-x is an excel csv file. Wildcards suported : *.csv");
         System.out.println("\t\t-l maxlines is optional: stop processing input file after maxlines.");
         System.out.println("\t\t");
+    }
+    //---------------------------------------------------------------------------------------------------
+    // Just here to test some modern methods to scan for files
+    //---------------------------------------------------------------------------------------------------
+    private static void AnotherMethodToScanFiles(String dirspec) throws IOException {
+        FileSearch sfbw = new FileSearch();
+        Path path = Paths.get(dirspec);
+        Path absolutePath = path.toAbsolutePath();          
+        try {
+            List<String> thelist = sfbw.searchWithWc(absolutePath, "glob:*.{csv}");
+            for ( int i = 0; i < thelist.size(); ++i ){
+                _logger.info("File Search from AnotherMethodToScanFiles --- Processing : " + thelist.get(i));
+            }
+        }
+        catch(FileNotFoundException fne) {
+            _logger.error(fne.getMessage());
+        }
     }
 }
 
