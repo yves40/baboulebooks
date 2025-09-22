@@ -4,14 +4,12 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.Exception;
 import java.nio.file.*;
-import java.nio.file.attribute.*;
 import java.util.StringTokenizer;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,7 +27,10 @@ import java.sql.ResultSet;
 
 import org.mouserabbit.utilities.helpers.FileScanHelper;
 import org.mouserabbit.utilities.log.Timer;
-import org.mouserabbit.baboulebooks.FileSearch;;
+import org.mouserabbit.baboulebooks.classes.*;
+
+
+// import org.mouserabbit.baboulebooks.FileSearch;
 
 /**
  *
@@ -52,7 +53,7 @@ public class Loader {
     private static int _maxlines = 0;
     private static Connection _dbconn = null;
     private static Logger _logger = null;
-    
+    private static final int TOKENNUMBER = 6;
     
     public static void main(String[] args) throws Exception {
 
@@ -110,33 +111,58 @@ public class Loader {
             String line;
             while ( files.HasMoreElements()) {
                 oneFile = files.NextFile();
-                int linecount = 0;
+                int linecount = 0;      // Number of lines processed
+                int loaded = 0;         // Number of valid lines processed
+                int formaterrors = 0;   // Number of badly formatted lines
                 try (Scanner myReader = new Scanner(oneFile)) {
                     while (myReader.hasNextLine()) {
 
+                        if(_maxlines != 0 && linecount > _maxlines)
+                            break;
+
                         String location = "";
+                        String skip = "";
                         String title = "";
+                        String lastname = "";
                         String firstname = "";
                         String editor = "";
-                        String lastname = "";
-                        String skip = "";
 
                         line = myReader.nextLine();
                         if(linecount != 0) {
                             linedata = new StringTokenizer(line, ";");
                             while(linedata.hasMoreElements()) {
-                                location = linedata.nextToken();
-                                skip = linedata.nextToken();
-                                title = linedata.nextToken();
-                                lastname = linedata.nextToken();
-                                firstname = linedata.nextToken();
-                                editor = linedata.nextToken();
-                                _logger.info( location + " ==> " + title + " : " + firstname + "." + lastname + " [" + editor + "]");
+                                // Check line structure
+                                if(linedata.countTokens() < TOKENNUMBER) {
+                                    _logger.warn("Line badly formatted : ");
+                                    _logger.warn(linedata);
+                                    ++formaterrors;
+                                }
+                                else {
+                                    // Get Data 
+                                    location = linedata.nextToken();
+                                    skip = linedata.nextToken();
+                                    title = linedata.nextToken();
+                                    lastname = linedata.nextToken();
+                                    firstname = linedata.nextToken();
+                                    editor = linedata.nextToken();
+    
+                                    Book newbook = new Book(title);
+                                    Editor neweditor = new Editor(editor);
+                                    Location newlocation = new Location(location);
+                                    Author newauthor = new Author(firstname, lastname);
+    
+                                    _logger.info( newlocation.get_city() + " ==> " + newbook.get_title() 
+                                        + " : " + newauthor.get_firstname()
+                                         + "." + newauthor.get_lastname() + " [" + neweditor.get_name() + "]");
+                                    ++loaded;
+                                }
+                                break;
                             }
                         }
                         ++linecount;
                     }
-                    _logger.info("Processed " + oneFile.getAbsolutePath() + " : " + linecount);
+                    _logger.info("Processed " + oneFile.getAbsolutePath() + " : " + loaded);
+                    _logger.info("Rejected  " + oneFile.getAbsolutePath() + " : " + formaterrors);
                 } catch (FileNotFoundException e) {
                     _logger.error(e.getMessage());
                 }
@@ -222,6 +248,7 @@ public class Loader {
             if (args[loop].equals("-l")) {
                 if (loop < args.length) {
                     _maxlines = Integer.parseInt(args[++loop]);
+                    _logger.warn("Will read at most " + _maxlines + " file(s)");
                     recognized = true;
                 }
             }
@@ -300,6 +327,10 @@ public class Loader {
                                 System.out.println( "DATABASE :  " + node.getTextContent());
                                 if(_exceldatafile != "") {_logger.warn("Overriding database with xml file parameter");}
                                 _exceldatafile = node.getTextContent();
+                                break;
+                    case "maxlines":
+                                System.out.println( "MAXLINES :  " + node.getTextContent());
+                                _maxlines = Integer.parseInt(node.getTextContent());
                                 break;
                     default:
                             throw new XMLParseException("XML parameter file invalid tag : [ " + node.getNodeName() + " ]");
