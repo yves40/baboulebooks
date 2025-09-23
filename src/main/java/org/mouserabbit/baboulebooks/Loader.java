@@ -22,8 +22,6 @@ import org.w3c.dom.Node;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.ResultSet;
 
 import org.mouserabbit.utilities.helpers.FileScanHelper;
 import org.mouserabbit.utilities.log.Timer;
@@ -42,7 +40,7 @@ import org.mouserabbit.baboulebooks.classes.*;
 public class Loader {
 
     // private static final Logger logger = LogManager.getLogger("HelloWorld");
-    private static String version = "Loader, Sep 23 2025 : 1.39";
+    private static String version = "Loader, Sep 23 2025 : 1.40";
     private static String _host = "localhost";
     private static int _port = 3306;
     private static String _user = "";
@@ -56,10 +54,6 @@ public class Loader {
     private static final int TOKENNUMBER = 6;
     
     public static void main(String[] args) throws Exception {
-
-        Statement stmt = null;
-        ResultSet rs = null;         
-
         // Want to know the elapsed time
         Timer tt = new Timer();
         // log4j2 parameters:  Uncomment this line in case tracing log4j is required
@@ -95,7 +89,6 @@ public class Loader {
             ProcessDataFiles();
             // Uncomment if you want to use this new utility class ;-)
             // AnotherMethodToScanFiles("data");
-            _dbconn.close();
         }
         catch (SQLException e) {
             _logger.error("SQL Error : " + e.getMessage());
@@ -113,12 +106,8 @@ public class Loader {
             System.exit(1);
         }
         finally {
-            if( rs != null) {
-                try {rs.close();}
-                catch(SQLException sqle) { _logger.error(sqle);}
-            }
-            if( stmt != null) {
-                try {stmt.close();}
+            if( _dbconn != null) {
+                try {_dbconn.close();}
                 catch(SQLException sqle) { _logger.error(sqle);}
             }
         }
@@ -148,7 +137,7 @@ public class Loader {
                             break;
 
                         String location = "";
-                        String skip = "";
+                        String id = "";
                         String title = "";
                         String lastname = "";
                         String firstname = "";
@@ -160,14 +149,15 @@ public class Loader {
                             while(linedata.hasMoreElements()) {
                                 // Check line structure
                                 if(linedata.countTokens() < TOKENNUMBER) {
-                                    _logger.warn("Line badly formatted : ");
-                                    _logger.warn(linedata);
+                                    location = linedata.nextToken();
+                                    id = linedata.nextToken();
+                                    _logger.warn("\tLine badly formatted for ID " + id);
                                     ++formaterrors;
                                 }
                                 else {
                                     // Get Data 
                                     location = linedata.nextToken();
-                                    skip = linedata.nextToken();
+                                    id = linedata.nextToken();
                                     title = linedata.nextToken();
                                     lastname = linedata.nextToken();
                                     firstname = linedata.nextToken();
@@ -175,12 +165,14 @@ public class Loader {
     
                                     Book newbook = new Book(title);
                                     Editor neweditor = new Editor(editor);
-                                    Location newlocation = new Location(location);
+                                    Location newlocation = new Location(location, _dbconn, _logger);
                                     Author newauthor = new Author(firstname, lastname);
     
-                                    _logger.info( newlocation.get_city() + " ==> " + newbook.get_title() 
-                                        + " : " + newauthor.get_firstname()
-                                         + "." + newauthor.get_lastname() + " [" + neweditor.get_name() + "]");
+                                    newlocation.Save();
+
+                                    // _logger.info( newlocation.get_city() + " ==> " + newbook.get_title() 
+                                    //     + " : " + newauthor.get_firstname()
+                                    //      + "." + newauthor.get_lastname() + " [" + neweditor.get_name() + "]");
                                     ++loaded;
                                 }
                                 break;
