@@ -42,7 +42,7 @@ import org.mouserabbit.baboulebooks.classes.*;
 public class Loader {
 
     // private static final Logger logger = LogManager.getLogger("HelloWorld");
-    private static String version = "Loader, Sep 22 2025 : 1.38";
+    private static String version = "Loader, Sep 23 2025 : 1.39";
     private static String _host = "localhost";
     private static int _port = 3306;
     private static String _user = "";
@@ -91,20 +91,47 @@ public class Loader {
             String connectstring = "jdbc:mysql://" +  _host + ":" + _port + "/" + _database + "?" + "user=" + _user + "&password=" + _password;
             _logger.info("Trying to  " + connectstring);
             _dbconn = DriverManager.getConnection(connectstring);
-
-            // Some select 
-            // stmt = _dbconn.createStatement();  
-            // if(stmt.execute("SELECT id, email, password,  firstname, lastname FROM users")) {
-            //     rs = stmt.getResultSet();
-            //     while (rs.next()) {
-            //         int id = rs.getInt(1);
-            //         String email = rs.getString(2);
-            //         _logger.info("User email  [" + id + "]  " + email );
-            //     }                
-            // }
-            // Exit
-
             // Process input file(s)
+            ProcessDataFiles();
+            // Uncomment if you want to use this new utility class ;-)
+            // AnotherMethodToScanFiles("data");
+            _dbconn.close();
+        }
+        catch (SQLException e) {
+            _logger.error("SQL Error : " + e.getMessage());
+            e.printStackTrace();
+            System.exit(1);
+        } 
+        catch (XMLParseException x) {
+            _logger.error("An Exception occured  : " + x.getMessage());
+            System.exit(1);
+
+        }
+        catch (Exception x) {
+            _logger.error("An Exception occured  : " + x.getMessage());
+            Usage();
+            System.exit(1);
+        }
+        finally {
+            if( rs != null) {
+                try {rs.close();}
+                catch(SQLException sqle) { _logger.error(sqle);}
+            }
+            if( stmt != null) {
+                try {stmt.close();}
+                catch(SQLException sqle) { _logger.error(sqle);}
+            }
+        }
+
+        // End of job
+        _logger.info("Job done in " + tt.getTimerString());
+        _logger.info("Exit now");
+        System.out.print("\n\n\n");
+    }
+    //---------------------------------------------------------------------------------------------------
+    //   Load data
+    //---------------------------------------------------------------------------------------------------
+    private static void ProcessDataFiles() throws Exception {
             StringTokenizer linedata; // To separate line elements
             FileScanHelper files = new FileScanHelper(_exceldatafile);
             File oneFile = null;  
@@ -167,41 +194,7 @@ public class Loader {
                     _logger.error(e.getMessage());
                 }
             }
-            // Uncomment if you want to use this new utility class ;-)
-            // AnotherMethodToScanFiles("data");
 
-            _dbconn.close();
-        }
-        catch (SQLException e) {
-            _logger.error("SQL Error : " + e.getMessage());
-            e.printStackTrace();
-            System.exit(1);
-        } 
-        catch (XMLParseException x) {
-            _logger.error("An Exception occured  : " + x.getMessage());
-            System.exit(1);
-
-        }
-        catch (Exception x) {
-            _logger.error("An Exception occured  : " + x.getMessage());
-            Usage();
-            System.exit(1);
-        }
-        finally {
-            if( rs != null) {
-                try {rs.close();}
-                catch(SQLException sqle) { _logger.error(sqle);}
-            }
-            if( stmt != null) {
-                try {stmt.close();}
-                catch(SQLException sqle) { _logger.error(sqle);}
-            }
-        }
-
-        // End of job
-        _logger.info("Job done in " + tt.getTimerString());
-        _logger.info("Exit now");
-        System.out.print("\n\n\n");
     }
     //---------------------------------------------------------------------------------------------------
     //   Analyze command line arguments
@@ -372,4 +365,20 @@ public class Loader {
         }
     }
 }
+/*
+ *  R E S E R V O I R    C O D E 
+ * 
+ *             // Some select 
+            // stmt = _dbconn.createStatement();  
+            // if(stmt.execute("SELECT id, email, password,  firstname, lastname FROM users")) {
+            //     rs = stmt.getResultSet();
+            //     while (rs.next()) {
+            //         int id = rs.getInt(1);
+            //         String email = rs.getString(2);
+            //         _logger.info("User email  [" + id + "]  " + email );
+            //     }                
+            // }
+            // Exit
+
+ */
 
