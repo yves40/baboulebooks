@@ -40,7 +40,7 @@ import org.mouserabbit.baboulebooks.classes.*;
 public class Loader {
 
     // private static final Logger logger = LogManager.getLogger("HelloWorld");
-    private static String version = "Loader, Sep 23 2025 : 1.40";
+    private static String version = "Loader, Sep 24 2025 : 1.42";
     private static String _host = "localhost";
     private static int _port = 3306;
     private static String _user = "";
@@ -48,7 +48,8 @@ public class Loader {
     private static String _database = "";
     private static String _xmlparameterfile = "";
     private static String _exceldatafile = "";
-    private static int _maxlines = 0;
+    private static int _maxlines = 0;               // Process only n lines
+    private static boolean _zerodata = false;        // Empty tables before insertion ?                            
     private static Connection _dbconn = null;
     private static Logger _logger = null;
     private static final int TOKENNUMBER = 6;
@@ -85,6 +86,13 @@ public class Loader {
             String connectstring = "jdbc:mysql://" +  _host + ":" + _port + "/" + _database + "?" + "user=" + _user + "&password=" + _password;
             _logger.info("Trying to  " + connectstring);
             _dbconn = DriverManager.getConnection(connectstring);
+            // Set up data objects static properties
+            Location.set_dbconn(_dbconn);
+            Location.set_logger(_logger);
+            // Purge ? 
+            if(_zerodata) {
+                Location.DeleteAll();
+            }
             // Process input file(s)
             ProcessDataFiles();
             // Uncomment if you want to use this new utility class ;-)
@@ -137,6 +145,7 @@ public class Loader {
                             break;
 
                         String location = "";
+                        String previousLocation = "";
                         String id = "";
                         String title = "";
                         String lastname = "";
@@ -157,6 +166,11 @@ public class Loader {
                                 else {
                                     // Get Data 
                                     location = linedata.nextToken();
+                                    if(previousLocation != location) {
+                                        previousLocation = location;
+                                        Location newlocation = new Location(location);
+                                        newlocation.Insert();
+                                    }
                                     id = linedata.nextToken();
                                     title = linedata.nextToken();
                                     lastname = linedata.nextToken();
@@ -165,10 +179,8 @@ public class Loader {
     
                                     Book newbook = new Book(title);
                                     Editor neweditor = new Editor(editor);
-                                    Location newlocation = new Location(location, _dbconn, _logger);
                                     Author newauthor = new Author(firstname, lastname);
-    
-                                    newlocation.Save();
+
 
                                     // _logger.info( newlocation.get_city() + " ==> " + newbook.get_title() 
                                     //     + " : " + newauthor.get_firstname()
@@ -244,6 +256,11 @@ public class Loader {
                     _xmlparameterfile = args[++loop];
                 }
             }
+            if (args[loop].equals("-z"))
+            {
+                recognized = true;
+                _zerodata = true;
+            }
             if (args[loop].equals("-x"))
             {
                 if (loop < args.length) {
@@ -317,6 +334,10 @@ public class Loader {
                                 System.out.println( "MAXLINES :  " + node.getTextContent());
                                 _maxlines = Integer.parseInt(node.getTextContent());
                                 break;
+                    case "zerodata":
+                                System.out.println( "CLEANUP DB :  " + node.getTextContent());
+                                _zerodata =  Boolean.valueOf(node.getTextContent());
+                                break;
                     default:
                             throw new XMLParseException("XML parameter file invalid tag : [ " + node.getNodeName() + " ]");
                 }
@@ -337,6 +358,7 @@ public class Loader {
         System.out.println("\t\t-f is optional and points to an xml file containing launch parameters.");
         System.out.println("\t\t-x is an excel csv file. Wildcards suported : *.csv");
         System.out.println("\t\t-l maxlines is optional: stop processing input file after maxlines.");
+        System.out.println("\t\t-z Empty DB tables before load");
         System.out.println("\t\t");
     }
     //---------------------------------------------------------------------------------------------------

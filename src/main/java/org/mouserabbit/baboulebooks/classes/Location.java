@@ -1,29 +1,29 @@
 package org.mouserabbit.baboulebooks.classes;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Connection;
+import java.sql.Statement;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import org.apache.logging.log4j.Logger;
 
 public class Location {
 
   protected int _id ;
   protected String _city;
-  protected Connection _dbconn = null;
-  protected Logger _logger = null;
+  protected static Connection _dbconn = null;
+  protected static Logger _logger = null;
 
   public Location(String _city) {
-    this._city = _city;
-  }
-  public Location(String _city, Connection _dbconn, Logger _logger) {
-    this._city = _city;
-    this._dbconn = _dbconn;
+    this._city = Normalize(_city);
   }
 
-  // Insert or Update location data
-  // Called after object is created and populated
-  public void Save() throws SQLException, Exception {
+  // ---------------------------------------------------------------------
+  // Insert location data
+  // Called after the object is created and populated
+  // ---------------------------------------------------------------------
+  public void Insert() throws SQLException, Exception {
 
     if(_dbconn == null) throw new Exception("DB connection is not initialized");
     PreparedStatement pstmt = _dbconn.prepareStatement("insert into locations ( loc_city ) values ( ? )");
@@ -32,10 +32,36 @@ public class Location {
       pstmt.execute();
     }
     catch(SQLIntegrityConstraintViolationException sqli) {
-      _logger.warn(this._city + " already exists");
+      // Already inserted, no action
     }
   }
+  // ---------------------------------------------------------------------
+  // Cleanup DB table
+  // ---------------------------------------------------------------------
+  public static void DeleteAll() throws Exception {
+    if(_dbconn == null) throw new Exception("DB connection is not initialized");
+    PreparedStatement stmt = _dbconn.prepareStatement("delete from locations");
+    try {
+      int i = stmt.executeUpdate();
+      _logger.info("Deleted " + i + " record(s)");
+      stmt.executeUpdate("commit");
+    }
+    catch(SQLException sqle) {
+      // Already inserted, no action
+      _logger.error("Cannot delete all Locations : " + sqle.getMessage());
+    }
 
+  }
+  // ---------------------------------------------------------------------
+  // Setters & Getters
+  // ---------------------------------------------------------------------
+  public static void set_dbconn(Connection _dbconn) {
+    Location._dbconn = _dbconn;
+  }
+
+  public static void set_logger(Logger _logger) {
+    Location._logger = _logger;
+  }
   public int get_id() {
     return _id;
   }
@@ -51,8 +77,18 @@ public class Location {
   public void set_city(String _city) {
     this._city = _city;
   }
-
-  
-  
+  // ---------------------------------------------------------------------
+  // Normalize location city
+  // ---------------------------------------------------------------------
+  protected String Normalize(String city) {
+    try {
+      String normalized = city.strip();
+      return normalized.substring(0, 1).toUpperCase() +  normalized.substring(1).toLowerCase();
+    }
+    catch(Exception e) {
+      System.out.println(e.getMessage());
+      return "";
+    }
+  }
   
 }
