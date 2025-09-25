@@ -23,9 +23,10 @@ CREATE TABLE IF NOT EXISTS `books` (
 DROP TABLE IF EXISTS `authors`;
 CREATE TABLE IF NOT EXISTS `authors` (
   `auth_id` int(11) NOT NULL AUTO_INCREMENT,
-  `auth_name` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `auth_fname` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `auth_lname` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`auth_id`),
-  UNIQUE KEY `IDX_AUTHORS` (`auth_name`) USING BTREE
+  UNIQUE KEY `IDX_AUTHORS` (`auth_lname`, `auth_fname`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `editors`;

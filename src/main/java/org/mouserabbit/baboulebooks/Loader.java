@@ -40,7 +40,7 @@ import org.mouserabbit.baboulebooks.classes.*;
 public class Loader {
 
     // private static final Logger logger = LogManager.getLogger("HelloWorld");
-    private static String version = "Loader, Sep 24 2025 : 1.42";
+    private static String version = "Loader, Sep 25 2025 : 1.44";
     private static String _host = "localhost";
     private static int _port = 3306;
     private static String _user = "";
@@ -69,7 +69,6 @@ public class Loader {
         System.out.print("\n\n\n");
         _logger.info(version);
         String logfile = System.getenv("log4j2.configurationFile");
-        _logger.info("Start now");
         _logger.debug("The log4j xml parameter file is set to " + logfile);
         if ( logfile == null ){
             System.out.print("You must pass log4j2.configurationFile environment variable on the command line\n");
@@ -82,16 +81,24 @@ public class Loader {
             // Any xml parameter file to be processed ?
             if(_xmlparameterfile != null) analyzeXMLParameterFile();
             checkParameters();
+            // Summary of some parameters before run
+            _logger.info("Maximum number of lines per file : " + 
+                        (_maxlines == 0 ? "No limit" : _maxlines));
+            _logger.info("Purge DB tables before run ?  : " + 
+                        (_zerodata == true ? "YES" : "NO"));
             // Connect the DB 
             String connectstring = "jdbc:mysql://" +  _host + ":" + _port + "/" + _database + "?" + "user=" + _user + "&password=" + _password;
-            _logger.info("Trying to  " + connectstring);
+            _logger.info("Connection : " + connectstring);
             _dbconn = DriverManager.getConnection(connectstring);
             // Set up data objects static properties
             Location.set_dbconn(_dbconn);
             Location.set_logger(_logger);
+            Author.set_dbconn(_dbconn);
+            Author.set_logger(_logger);
             // Purge ? 
             if(_zerodata) {
                 Location.DeleteAll();
+                Author.DeleteAll();
             }
             // Process input file(s)
             ProcessDataFiles();
@@ -129,76 +136,73 @@ public class Loader {
     //   Load data
     //---------------------------------------------------------------------------------------------------
     private static void ProcessDataFiles() throws Exception {
-            StringTokenizer linedata; // To separate line elements
-            FileScanHelper files = new FileScanHelper(_exceldatafile);
-            File oneFile = null;  
-            String line;
-            while ( files.HasMoreElements()) {
-                oneFile = files.NextFile();
-                int linecount = 0;      // Number of lines processed
-                int loaded = 0;         // Number of valid lines processed
-                int formaterrors = 0;   // Number of badly formatted lines
-                try (Scanner myReader = new Scanner(oneFile)) {
-                    while (myReader.hasNextLine()) {
+        StringTokenizer linedata; // To separate line elements
+        FileScanHelper files = new FileScanHelper(_exceldatafile);
+        File oneFile = null;  
+        String line;
+        while ( files.HasMoreElements()) {
+            oneFile = files.NextFile();
+            System.out.println("\n");
+            _logger.info("Processing :" + oneFile.getAbsolutePath());
+            int linecount = 0;      // Number of lines processed
+            int loaded = 0;         // Number of valid lines processed
+            int formaterrors = 0;   // Number of badly formatted lines
+            try (Scanner myReader = new Scanner(oneFile)) {
+                while (myReader.hasNextLine()) {
 
-                        if(_maxlines != 0 && linecount > _maxlines)
-                            break;
+                    if(_maxlines != 0 && linecount > _maxlines)
+                        break;
 
-                        String location = "";
-                        String previousLocation = "";
-                        String id = "";
-                        String title = "";
-                        String lastname = "";
-                        String firstname = "";
-                        String editor = "";
+                    String location = "";
+                    String previousLocation = "";
+                    String id = "";
+                    String title = "";
+                    String lastname = "";
+                    String firstname = "";
+                    String editor = "";
 
-                        line = myReader.nextLine();
-                        if(linecount != 0) {
-                            linedata = new StringTokenizer(line, ";");
-                            while(linedata.hasMoreElements()) {
-                                // Check line structure
-                                if(linedata.countTokens() < TOKENNUMBER) {
-                                    location = linedata.nextToken();
-                                    id = linedata.nextToken();
-                                    _logger.warn("\tLine badly formatted for ID " + id);
-                                    ++formaterrors;
-                                }
-                                else {
-                                    // Get Data 
-                                    location = linedata.nextToken();
-                                    if(previousLocation != location) {
-                                        previousLocation = location;
-                                        Location newlocation = new Location(location);
-                                        newlocation.Insert();
-                                    }
-                                    id = linedata.nextToken();
-                                    title = linedata.nextToken();
-                                    lastname = linedata.nextToken();
-                                    firstname = linedata.nextToken();
-                                    editor = linedata.nextToken();
-    
-                                    Book newbook = new Book(title);
-                                    Editor neweditor = new Editor(editor);
-                                    Author newauthor = new Author(firstname, lastname);
-
-
-                                    // _logger.info( newlocation.get_city() + " ==> " + newbook.get_title() 
-                                    //     + " : " + newauthor.get_firstname()
-                                    //      + "." + newauthor.get_lastname() + " [" + neweditor.get_name() + "]");
-                                    ++loaded;
-                                }
-                                break;
+                    line = myReader.nextLine();
+                    if(linecount != 0) {
+                        linedata = new StringTokenizer(line, ";");
+                        while(linedata.hasMoreElements()) {
+                            // Check line structure
+                            if(linedata.countTokens() < TOKENNUMBER) {
+                                location = linedata.nextToken();
+                                id = linedata.nextToken();
+                                _logger.warn("\tLine badly formatted for ID " + id);
+                                ++formaterrors;
                             }
+                            else {
+                                // Get Data 
+                                location = linedata.nextToken();
+                                if(previousLocation != location) {
+                                    previousLocation = location;
+                                    Location newlocation = new Location(location);
+                                    newlocation.Insert();
+                                }
+                                id = linedata.nextToken();
+                                title = linedata.nextToken();
+                                lastname = linedata.nextToken();
+                                firstname = linedata.nextToken();
+                                editor = linedata.nextToken();
+                                
+                                Author newauthor = new Author(firstname, lastname);
+                                newauthor.Insert();
+                                Editor neweditor = new Editor(editor);
+                                Book newbook = new Book(title);
+                                ++loaded;
+                            }
+                            break;
                         }
-                        ++linecount;
                     }
-                    _logger.info("Processed " + oneFile.getAbsolutePath() + " : " + loaded);
-                    _logger.info("Rejected  " + oneFile.getAbsolutePath() + " : " + formaterrors);
-                } catch (FileNotFoundException e) {
-                    _logger.error(e.getMessage());
+                    ++linecount;
                 }
+                _logger.info("\tInserted  : " +  loaded + " line(s)");
+                _logger.info("\tRejected  " + oneFile.getAbsolutePath() + " : " + formaterrors);
+            } catch (FileNotFoundException e) {
+                _logger.error(e.getMessage());
             }
-
+        }
     }
     //---------------------------------------------------------------------------------------------------
     //   Analyze command line arguments
@@ -288,8 +292,23 @@ public class Loader {
         if(_exceldatafile.equals("")) {throw new Exception("Missing excel data filename : use -d qualifier");}
     }
     //---------------------------------------------------------------------------------------------------
-    //   Parse an XML parameter file 
+    //   Parse an XML parameter file : sample format here
+    //   host, port, maxlines and zerodata are optional
     //---------------------------------------------------------------------------------------------------
+    /*
+     * 
+     <server>
+        <host>localhost</host>
+        <port>3306</port>
+        <user>baboule</user>
+        <password>Baboule40</password>
+        <database>babouledb</database>
+        <exceldatafile>data/*.csv</exceldatafile>
+        <maxlines>15</maxlines>
+        <zerodata>true</zerodata>
+    </server>
+
+     */
     private static void analyzeXMLParameterFile() throws Exception, XMLParseException {
         _logger.info("Processing XML parameter file : " + _xmlparameterfile);
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -302,40 +321,31 @@ public class Loader {
             if(node.getNodeType() == Node.ELEMENT_NODE) {
                 switch(node.getNodeName()) {
                     case "host":
-                                System.out.println( "HOST :  " + node.getTextContent());
-                                if(_host != "") {_logger.warn("Overriding host with xml file parameter");}
                                 _host = node.getTextContent();
                                 break;
                     case "port":
-                                System.out.println( "PORT :  " + node.getTextContent());
                                 _port = Integer.parseInt(node.getTextContent());
                                 break;
                     case "user":
-                                System.out.println( "USER :  " + node.getTextContent());
                                 if(_user != "") {_logger.warn("Overriding user with xml file parameter");}
                                 _user = node.getTextContent();
                                 break;
                     case "password":
-                                System.out.println( "PASSWORD :  " + node.getTextContent());
                                 if(_password != "") {_logger.warn("Overriding password with xml file parameter");}
                                 _password = node.getTextContent();
                                 break;
                     case "database":
-                                System.out.println( "DATABASE :  " + node.getTextContent());
                                 if(_database != "") {_logger.warn("Overriding database with xml file parameter");}
                                 _database = node.getTextContent();
                                 break;
                     case "exceldatafile":
-                                System.out.println( "DATABASE :  " + node.getTextContent());
                                 if(_exceldatafile != "") {_logger.warn("Overriding database with xml file parameter");}
                                 _exceldatafile = node.getTextContent();
                                 break;
                     case "maxlines":
-                                System.out.println( "MAXLINES :  " + node.getTextContent());
                                 _maxlines = Integer.parseInt(node.getTextContent());
                                 break;
                     case "zerodata":
-                                System.out.println( "CLEANUP DB :  " + node.getTextContent());
                                 _zerodata =  Boolean.valueOf(node.getTextContent());
                                 break;
                     default:
