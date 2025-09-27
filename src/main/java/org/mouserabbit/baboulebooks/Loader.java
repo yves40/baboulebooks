@@ -99,9 +99,12 @@ public class Loader {
             Author.set_dbconn(_dbconn);
             Author.set_logger(_logger); 
             Editor.set_dbconn(_dbconn);
-            Editor.set_logger(_logger); 
+            Editor.set_logger(_logger);
+            Book.set_dbconn(_dbconn);
+            Book.set_logger(_logger);
             // Purge ? 
             if(_zerodata) {
+                Book.DeleteAll();
                 Location.DeleteAll();
                 Author.DeleteAll();
                 Editor.DeleteAll();
@@ -180,11 +183,12 @@ public class Loader {
                                 ++formaterrors;
                             }
                             else {
+                                Location newlocation = null;
                                 // Insert Data : 4 tables
                                 location = linedata.nextToken();
                                 if(previousLocation != location) {
                                     previousLocation = location;
-                                    Location newlocation = new Location(location);
+                                     newlocation = new Location(location);
                                     newlocation.Insert();
                                 }
                                 id = linedata.nextToken();
@@ -198,6 +202,10 @@ public class Loader {
                                 Editor neweditor = new Editor(editor);
                                 neweditor.Insert();
                                 Book newbook = new Book(title);
+                                newbook.set_author(newauthor.get_id());
+                                newbook.set_location(newlocation.get_id());
+                                newbook.set_editor(neweditor.get_id());
+                                newbook.Insert();
                                 ++loaded;
                             }
                             break;
@@ -222,6 +230,7 @@ public class Loader {
         int nbauthors = 0;
         int nbeditors = 0;
         int nblocations = 0;
+        int nbbooks = 0;
 
         try {
             Statement stmt = _dbconn.createStatement();
@@ -242,6 +251,12 @@ public class Loader {
             while(rs.next()) {
                 nblocations = rs.getInt(1);
                 _logger.info(nblocations + " locations in the table");
+            }
+            stmt.executeQuery("select count(distinct bk_id) from books ");
+            rs = stmt.getResultSet();
+            while(rs.next()) {
+                nbbooks = rs.getInt(1);
+                _logger.info(nbbooks + " books in the table");
             }
             System.out.println("\n\n");
         }

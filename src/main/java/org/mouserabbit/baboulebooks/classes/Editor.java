@@ -20,7 +20,7 @@ public class Editor {
   public Editor(String _name) {
     this._name = Normalize(_name);
   }
-    // ---------------------------------------------------------------------
+  // ---------------------------------------------------------------------
   // Insert Editor data
   // Called after the object is created and populated
   // ---------------------------------------------------------------------
