@@ -1,9 +1,11 @@
 package org.mouserabbit.baboulebooks.classes;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.sql.ResultSet;
 import org.apache.logging.log4j.Logger;
 
 public class Location {
@@ -25,10 +27,16 @@ public class Location {
   public void Insert() throws SQLException, Exception {
 
     if(_dbconn == null) throw new Exception("DB connection is not initialized");
-    PreparedStatement pstmt = _dbconn.prepareStatement("insert into locations ( loc_city ) values ( ? )");
-    pstmt.setString(1, this._city);
+    Statement stmt = _dbconn.createStatement();
     try {
-      pstmt.execute();
+      stmt.executeUpdate("insert into locations ( loc_city ) " + 
+            "values ( '" + this._city + "' )",
+            Statement.RETURN_GENERATED_KEYS);   
+      ResultSet rs = stmt.getGeneratedKeys();
+      if(rs.next()) {
+        this._id = rs.getInt(1);
+      }
+      stmt.executeUpdate("commit");
     }
     catch(SQLIntegrityConstraintViolationException sqli) {
       // Already inserted, no action

@@ -2,14 +2,18 @@ package org.mouserabbit.baboulebooks.classes;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.SQLSyntaxErrorException;
+import java.sql.SQLTimeoutException;
 
 import org.apache.logging.log4j.Logger;
 
 public class Author {
   
-  private static String version = "Location, Sep 25 2025 : 1.11";
+  private static String version = "Location, Sep 26 2025 : 1.12";
   protected int _id ;
   protected String _firstname ;
   protected String _lastname ;
@@ -27,14 +31,23 @@ public class Author {
   public void Insert() throws SQLException, Exception {
 
     if(_dbconn == null) throw new Exception("DB connection is not initialized");
-    PreparedStatement pstmt = _dbconn.prepareStatement("insert into authors ( auth_fname, auth_lname ) values ( ?, ? )");
-    pstmt.setString(1, this._firstname);
-    pstmt.setString(2, this._lastname);
+    Statement stmt = _dbconn.createStatement();
+    String sqlstatement = "insert into authors ( auth_fname, auth_lname ) values ( \"" + 
+      this._firstname + "\",\"" +  this._lastname + "\" )";
     try {
-      pstmt.execute();
+      stmt.executeUpdate(sqlstatement,Statement.RETURN_GENERATED_KEYS);
+      ResultSet rs = stmt.getGeneratedKeys();
+      if(rs.next()) {
+        this._id = rs.getInt(1);
+      }
+      stmt.executeUpdate("commit");
     }
     catch(SQLIntegrityConstraintViolationException sqli) {
       // Already inserted, no action
+    }
+    catch(SQLSyntaxErrorException sqlse) {
+      _logger.error(sqlse.getMessage());
+      _logger.error(sqlstatement);
     }
   }
   // ---------------------------------------------------------------------

@@ -21,7 +21,10 @@ import org.w3c.dom.Node;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.Statement;
 
 import org.mouserabbit.utilities.helpers.FileScanHelper;
 import org.mouserabbit.utilities.log.Timer;
@@ -94,14 +97,19 @@ public class Loader {
             Location.set_dbconn(_dbconn);
             Location.set_logger(_logger);
             Author.set_dbconn(_dbconn);
-            Author.set_logger(_logger);
+            Author.set_logger(_logger); 
+            Editor.set_dbconn(_dbconn);
+            Editor.set_logger(_logger); 
             // Purge ? 
             if(_zerodata) {
                 Location.DeleteAll();
                 Author.DeleteAll();
+                Editor.DeleteAll();
             }
             // Process input file(s)
             ProcessDataFiles();
+            // Some report
+            reportRun();
             // Uncomment if you want to use this new utility class ;-)
             // AnotherMethodToScanFiles("data");
         }
@@ -126,7 +134,6 @@ public class Loader {
                 catch(SQLException sqle) { _logger.error(sqle);}
             }
         }
-
         // End of job
         _logger.info("Job done in " + tt.getTimerString());
         _logger.info("Exit now");
@@ -173,7 +180,7 @@ public class Loader {
                                 ++formaterrors;
                             }
                             else {
-                                // Get Data 
+                                // Insert Data : 4 tables
                                 location = linedata.nextToken();
                                 if(previousLocation != location) {
                                     previousLocation = location;
@@ -189,6 +196,7 @@ public class Loader {
                                 Author newauthor = new Author(firstname, lastname);
                                 newauthor.Insert();
                                 Editor neweditor = new Editor(editor);
+                                neweditor.Insert();
                                 Book newbook = new Book(title);
                                 ++loaded;
                             }
@@ -197,11 +205,49 @@ public class Loader {
                     }
                     ++linecount;
                 }
+                _logger.info("\tNumber of data lines in file : " + (linecount-1));
                 _logger.info("\tInserted  : " +  loaded + " line(s)");
                 _logger.info("\tRejected  " + oneFile.getAbsolutePath() + " : " + formaterrors);
-            } catch (FileNotFoundException e) {
+            } 
+            catch (FileNotFoundException e) {
                 _logger.error(e.getMessage());
             }
+        }
+    }
+    //---------------------------------------------------------------------------------------------------
+    //   Some final report
+    //---------------------------------------------------------------------------------------------------
+    private static void reportRun() {
+        System.out.println("\n\n");
+        int nbauthors = 0;
+        int nbeditors = 0;
+        int nblocations = 0;
+
+        try {
+            Statement stmt = _dbconn.createStatement();
+            stmt.executeQuery("select count(distinct auth_id) from authors ");
+            ResultSet rs = stmt.getResultSet();
+            while(rs.next()) {
+                nbauthors = rs.getInt(1);
+                _logger.info(nbauthors + " authors in the table");
+            }
+            stmt.executeQuery("select count(distinct ed_id) from editors ");
+            rs = stmt.getResultSet();
+            while(rs.next()) {
+                nbeditors = rs.getInt(1);
+                _logger.info(nbeditors + " editors in the table");
+            }
+            stmt.executeQuery("select count(distinct loc_id) from locations ");
+            rs = stmt.getResultSet();
+            while(rs.next()) {
+                nblocations = rs.getInt(1);
+                _logger.info(nblocations + " locations in the table");
+            }
+            System.out.println("\n\n");
+        }
+        catch(SQLException sqle) {
+            // Already inserted, no action
+            _logger.error(sqle.getMessage());
         }
     }
     //---------------------------------------------------------------------------------------------------
@@ -403,6 +449,10 @@ public class Loader {
             //     }                
             // }
             // Exit
+
+
+            Scanner scanner = new Scanner( System.in );
+            String prefix = scanner.nextLine();
 
  */
 
