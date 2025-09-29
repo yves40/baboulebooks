@@ -157,6 +157,8 @@ public class Loader {
             int linecount = 0;      // Number of lines processed
             int loaded = 0;         // Number of valid lines processed
             int formaterrors = 0;   // Number of badly formatted lines
+            Location newlocation = null;
+
             try (Scanner myReader = new Scanner(oneFile)) {
                 while (myReader.hasNextLine()) {
 
@@ -164,7 +166,6 @@ public class Loader {
                         break;
 
                     String location = "";
-                    String previousLocation = "";
                     String id = "";
                     String title = "";
                     String lastname = "";
@@ -183,13 +184,21 @@ public class Loader {
                                 ++formaterrors;
                             }
                             else {
-                                Location newlocation = null;
                                 // Insert Data : 4 tables
                                 location = linedata.nextToken();
-                                if(previousLocation != location) {
-                                    previousLocation = location;
-                                     newlocation = new Location(location);
+                                if(newlocation == null) {   // 1st data line ? 
+                                    newlocation = new Location(location);
                                     newlocation.Insert();
+                                }
+                                else {
+                                    String toto = newlocation.get_city();
+                                    if ( toto.equals(newlocation.get_city())) {
+                                        _logger.info("Existing Location : " + newlocation.get_id() + " : " + newlocation.get_city());
+                                    }
+                                    else {
+                                        newlocation = new Location(location);
+                                        newlocation.Insert();
+                                    }
                                 }
                                 id = linedata.nextToken();
                                 title = linedata.nextToken();
