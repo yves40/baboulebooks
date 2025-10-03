@@ -191,11 +191,7 @@ public class Loader {
                                     newlocation.Insert();
                                 }
                                 else {
-                                    String toto = newlocation.get_city();
-                                    if ( toto.equals(newlocation.get_city())) {
-                                        _logger.info("Existing Location : " + newlocation.get_id() + " : " + newlocation.get_city());
-                                    }
-                                    else {
+                                    if ( ! location.equals(newlocation.get_city())) {
                                         newlocation = new Location(location);
                                         newlocation.Insert();
                                     }

@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 public class Editor {
 
-  private static String version = "Editor, Sep 27 2025 : 1.01";
+  private static String version = "Editor, Oct 03 2025 : 1.02";
   protected int _id ;
   protected String _name;
   protected static Connection _dbconn = null;
@@ -38,8 +38,50 @@ public class Editor {
       }
       stmt.executeUpdate("commit");
     }
+    // If duplicate Editor, fill this object with existing data
     catch(SQLIntegrityConstraintViolationException sqli) {
-      // Already inserted, no action
+      // Already inserted, get exisiting data
+      Editor alreadyexists = getEditorByName(this._name);
+      this.set_id(alreadyexists.get_id());
+    }
+  }
+  // ---------------------------------------------------------------------
+  // Get editor data
+  // ---------------------------------------------------------------------
+  public Editor getEditorByName(String name) throws Exception {
+    if(_dbconn == null) throw new Exception("DB connection is not initialized");
+    Statement stmt = _dbconn.createStatement();
+    try {
+      stmt.executeQuery("select * from editors where ed_name = '" +  name + "'");   
+      ResultSet rs = stmt.getResultSet();
+      Editor ed = null;
+      if(rs.next()) {
+        ed = new Editor(rs.getString("ed_name"));
+        ed.set_id(rs.getInt("ed_id"));
+      }
+      return ed;
+    }
+    catch(SQLException sqle) {
+      _logger.error(sqle.getMessage());
+      return new Editor(name);
+    }
+  }
+  public Editor getEditorByid(int id) throws Exception {
+    if(_dbconn == null) throw new Exception("DB connection is not initialized");
+    Statement stmt = _dbconn.createStatement();
+    try {
+      stmt.executeQuery("select * from editors where ed_id = " +  id );   
+      ResultSet rs = stmt.getResultSet();
+      Editor ed = null;
+      if(rs.next()) {
+        ed = new Editor(rs.getString("ed_name"));
+        ed.set_id(rs.getInt("ed_id"));
+      }
+      return ed;
+    }
+    catch(SQLException sqle) {
+      _logger.error(sqle.getMessage());
+      return new Editor("Editor ID Not found");
     }
   }
   // ---------------------------------------------------------------------

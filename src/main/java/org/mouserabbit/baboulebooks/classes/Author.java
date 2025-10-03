@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 public class Author {
   
-  private static String version = "Location, Sep 26 2025 : 1.12";
+  private static String version = "Location, Oct 03 2025 : 1.13";
   protected int _id ;
   protected String _firstname ;
   protected String _lastname ;
@@ -43,11 +43,53 @@ public class Author {
       stmt.executeUpdate("commit");
     }
     catch(SQLIntegrityConstraintViolationException sqli) {
-      // Already inserted, no action
+      // Already inserted, get exisiting data
+      Author alreadyexists = getAuthorByName(this._firstname, this._lastname);
+      this.set_id(alreadyexists.get_id());
     }
     catch(SQLSyntaxErrorException sqlse) {
       _logger.error(sqlse.getMessage());
       _logger.error(sqlstatement);
+    }
+  }
+  // ---------------------------------------------------------------------
+  // Get Location data
+  // ---------------------------------------------------------------------
+  public Author getAuthorByName(String firstname, String lastname) throws Exception {
+    if(_dbconn == null) throw new Exception("DB connection is not initialized");
+    Statement stmt = _dbconn.createStatement();
+    try {
+      stmt.executeQuery("select * from authors where auth_fname = '" +  firstname + "'" +
+                        " and auth_lname = '" +  lastname + "'");   
+      ResultSet rs = stmt.getResultSet();
+      Author author = null;
+      if(rs.next()) {
+        author = new Author(rs.getString("auth_fname"), rs.getString("auth_lname"));
+        author.set_id(rs.getInt("auth_id"));
+      }
+      return author;
+    }
+    catch(SQLException sqle) {
+      _logger.error(sqle.getMessage());
+      return new Author("","");
+    }
+  }
+  public Author getAuthorByid(int id) throws Exception {
+    if(_dbconn == null) throw new Exception("DB connection is not initialized");
+    Statement stmt = _dbconn.createStatement();
+    try {
+      stmt.executeQuery("select * from authors where auth_id = " +  id );   
+      ResultSet rs = stmt.getResultSet();
+      Author author = null;
+      if(rs.next()) {
+        author = new Author(rs.getString("auth_fname"), rs.getString("auth_lname"));
+        author.set_id(rs.getInt("auth_id"));
+      }
+      return author;
+    }
+    catch(SQLException sqle) {
+      _logger.error(sqle.getMessage());
+      return new Author("","");
     }
   }
   // ---------------------------------------------------------------------
@@ -98,6 +140,16 @@ public class Author {
   }
   public String get_lastname() {
     return _lastname;
+  }
+  
+  public void set_id(int _id) {
+    this._id = _id;
+  }
+  public void set_firstname(String _firstname) {
+    this._firstname = _firstname;
+  }
+  public void set_lastname(String _lastname) {
+    this._lastname = _lastname;
   }
   public static void set_dbconn(Connection _dbconn) {
     Author._dbconn = _dbconn;

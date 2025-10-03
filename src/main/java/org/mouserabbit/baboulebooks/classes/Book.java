@@ -42,6 +42,7 @@ public class Book {
                 "," + this._location + 
                 ",\"" + this._title + "\"" +
             " )";
+            // _logger.debug("Insert book : " + this._title);
       stmt.executeUpdate(sqlstatement, Statement.RETURN_GENERATED_KEYS);   
       ResultSet rs = stmt.getGeneratedKeys();
       if(rs.next()) {
@@ -51,10 +52,55 @@ public class Book {
     }
     catch(SQLSyntaxErrorException sqlsyn) {
       _logger.error(sqlsyn.getMessage());
-      // _logger.error(sqlstatement);
     }
     catch(SQLIntegrityConstraintViolationException sqli) {
       // Already inserted, no action
+      _logger.debug("Integrity constraint violation : " + this._title);
+    }
+    catch(SQLException sqle) {
+      _logger.debug("SQL exception : " + this._title);
+      // Already inserted, get exisiting data
+      Book alreadyexists = getBookByTitle(this._title);
+      this.set_id(alreadyexists.get_id());
+    }
+  }
+  // ---------------------------------------------------------------------
+  // Get Book data
+  // ---------------------------------------------------------------------
+  public Book getBookByTitle(String title) throws Exception {
+    if(_dbconn == null) throw new Exception("DB connection is not initialized");
+    Statement stmt = _dbconn.createStatement();
+    try {
+      stmt.executeQuery("select * from books where bk_title = '" +  title + "'");   
+      ResultSet rs = stmt.getResultSet();
+      Book book = null;
+      if(rs.next()) {
+        book = new Book(rs.getString("bk_title"));
+        book.set_id(rs.getInt("bk_id"));
+      }
+      return book;
+    }
+    catch(SQLException sqle) {
+      _logger.error(sqle.getMessage());
+      return new Book(title);
+    }
+  }
+  public Book getBookByid(int id) throws Exception {
+    if(_dbconn == null) throw new Exception("DB connection is not initialized");
+    Statement stmt = _dbconn.createStatement();
+    try {
+      stmt.executeQuery("select * from books where bk_id = " +  id );   
+      ResultSet rs = stmt.getResultSet();
+      Book book = null;
+      if(rs.next()) {
+        book = new Book(rs.getString("bk_title"));
+        book.set_id(rs.getInt("bk_id"));
+      }
+      return book;
+    }
+    catch(SQLException sqle) {
+      _logger.error(sqle.getMessage());
+      return new Book("Book ID not found");
     }
   }
   // ---------------------------------------------------------------------

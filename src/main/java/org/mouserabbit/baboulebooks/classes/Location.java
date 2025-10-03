@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 public class Location {
 
-  private static String version = "Location, Sep 25 2025 : 1.12";
+  private static String version = "Location, Oct 03 2025 : 1.13";
   protected int _id ;
   protected String _city;
   protected static Connection _dbconn = null;
@@ -39,7 +39,48 @@ public class Location {
       stmt.executeUpdate("commit");
     }
     catch(SQLIntegrityConstraintViolationException sqli) {
-      // Already inserted, no action
+      // Already inserted, get exisiting data
+      Location alreadyexists = getLocationByCity(this._city);
+      this.set_id(alreadyexists.get_id());
+    }
+  }
+  // ---------------------------------------------------------------------
+  // Get Location data
+  // ---------------------------------------------------------------------
+  public Location getLocationByCity(String city) throws Exception {
+    if(_dbconn == null) throw new Exception("DB connection is not initialized");
+    Statement stmt = _dbconn.createStatement();
+    try {
+      stmt.executeQuery("select * from locations where loc_city = '" +  city + "'");   
+      ResultSet rs = stmt.getResultSet();
+      Location loc = null;
+      if(rs.next()) {
+        loc = new Location(rs.getString("loc_city"));
+        loc.set_id(rs.getInt("loc_id"));
+      }
+      return loc;
+    }
+    catch(SQLException sqle) {
+      _logger.error(sqle.getMessage());
+      return new Location(city);
+    }
+  }
+  public Location getLocationByid(int id) throws Exception {
+    if(_dbconn == null) throw new Exception("DB connection is not initialized");
+    Statement stmt = _dbconn.createStatement();
+    try {
+      stmt.executeQuery("select * from locations where loc_id = " +  id );   
+      ResultSet rs = stmt.getResultSet();
+      Location loc = null;
+      if(rs.next()) {
+        loc = new Location(rs.getString("loc_city"));
+        loc.set_id(rs.getInt("loc_id"));
+      }
+      return loc;
+    }
+    catch(SQLException sqle) {
+      _logger.error(sqle.getMessage());
+      return new Location("City ID Not found");
     }
   }
   // ---------------------------------------------------------------------
