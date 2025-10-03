@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : mar. 23 sep. 2025 à 07:52
+-- Généré le : ven. 03 oct. 2025 à 16:35
 -- Version du serveur : 5.7.36
 -- Version de PHP : 7.4.26
 
@@ -30,10 +30,54 @@ SET time_zone = "+00:00";
 DROP TABLE IF EXISTS `authors`;
 CREATE TABLE IF NOT EXISTS `authors` (
   `auth_id` int(11) NOT NULL AUTO_INCREMENT,
-  `auth_name` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `auth_fname` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `auth_lname` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`auth_id`),
-  UNIQUE KEY `IDX_AUTHORS` (`auth_name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `IDX_AUTHORS` (`auth_lname`,`auth_fname`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=9594 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `authors`
+--
+
+INSERT INTO `authors` (`auth_id`, `auth_fname`, `auth_lname`) VALUES
+(9573, 'Olivier', 'ADAM'),
+(9572, 'Jeffrey', 'ARCHER'),
+(9586, 'Tahar', 'BEN JELLOUN'),
+(9581, 'Yves', 'CANNAC'),
+(9577, 'André', 'CASTELOT'),
+(9569, 'Philippe', 'CLAUDEL'),
+(9560, 'Harlan', 'COBEN'),
+(9582, 'Jean-marie/jean-yves', 'COOLOMNANI/LHOMEAU'),
+(9579, 'Christine', 'DE RIVOYRE'),
+(9564, 'Lionel', 'DUROY'),
+(9593, 'Jean-luois', 'ETIENNE'),
+(9568, 'Luc', 'FERRY'),
+(9571, 'Susan', 'FORWARD'),
+(9561, 'Claudie', 'GALLAY'),
+(9565, 'Laurent', 'GAUDE'),
+(9583, 'Maurice', 'GENEVOIX'),
+(9590, 'Marguerite', 'GENTZBITTEL'),
+(9576, 'Jean', 'JAMET'),
+(9570, 'Nathalie', 'KUPERMAN'),
+(9558, 'Camilla', 'LÄCKBERG'),
+(9574, 'Patrick', 'LAPEYRE'),
+(9567, 'Carole', 'MARTINEZ'),
+(9584, 'Robert', 'MERLE'),
+(9588, 'Patrick', 'MODIANO'),
+(9556, 'Yann', 'MOIX'),
+(9580, 'Catherine', 'NAY'),
+(9563, 'Sofi', 'OKSANEN'),
+(9592, 'Katherine', 'PANCOL'),
+(9589, 'Nean', 'REY'),
+(9566, 'Michel', 'ROSTAIN'),
+(9559, 'Jean-christophe', 'RUFIN'),
+(9575, 'Luis', 'SEPULVADA'),
+(9578, 'Christian', 'SIGNOL'),
+(9562, 'Dai', 'SIJIE'),
+(9557, 'Vikas', 'SWARUP'),
+(9591, 'Vladimir', 'VOLKOFF'),
+(9585, 'Eugen', 'WEBER');
 
 -- --------------------------------------------------------
 
@@ -53,7 +97,51 @@ CREATE TABLE IF NOT EXISTS `books` (
   KEY `FK_AUTHOR` (`bk_author`),
   KEY `FK_EDITOR` (`bk_editor`),
   KEY `FK_LOCATION` (`bk_location`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=492 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `books`
+--
+
+INSERT INTO `books` (`bk_id`, `bk_title`, `bk_author`, `bk_location`, `bk_editor`) VALUES
+(454, 'Naissance', 9556, 9435, 808),
+(455, 'Meutre dans un jardin indien', 9557, 9435, 809),
+(456, 'Le prédicateur', 9558, 9435, 810),
+(457, 'Katiba', 9559, 9435, 811),
+(458, 'Sans laisser d\'adresse', 9560, 9435, 809),
+(459, 'L\'amour est une île', 9561, 9435, 810),
+(460, 'Trois vies chinoises', 9562, 9435, 811),
+(461, 'Purge', 9563, 9435, 815),
+(462, 'Le chagrin', 9564, 9435, 816),
+(463, 'Ouragan', 9565, 9435, 810),
+(464, 'Le fils', 9566, 9435, 818),
+(465, 'Le cœur cousu', 9567, 9435, 819),
+(466, 'La révolution de l\'amour', 9568, 9435, 820),
+(467, 'L\'enquête', 9569, 9435, 815),
+(468, 'Nous étions des êtres vivants', 9570, 9435, 822),
+(469, 'Parents toxiques', 9571, 9435, 823),
+(470, 'Only Time Will Tell', 9572, 9435, 824),
+(471, 'Les lisières', 9573, 9435, 811),
+(472, 'La vie est brève et le désir sans fin', 9574, 9435, 826),
+(473, 'L\'ombre de ce que nous avons été', 9575, 9435, 827),
+(474, 'Une parole étouffée', 9576, 9436, 828),
+(475, 'Au fil de l\'histoire', 9577, 9436, 829),
+(476, 'La rivière espérance', 9578, 9436, 830),
+(477, 'Belle alliance', 9579, 9436, 808),
+(478, 'Le Noir et le Rouge', 9580, 9436, 808),
+(479, 'Le juste pouvoir', 9581, 9436, 833),
+(480, 'Le mariage blanc', 9582, 9436, 808),
+(481, 'Lorelei', 9583, 9436, 835),
+(482, 'Malevol', 9584, 9436, 822),
+(483, 'La fin des terroirs', 9585, 9436, 837),
+(484, 'L\'enfant de sable', 9586, 9436, 835),
+(485, 'La nuit sacrée', 9586, 9436, 835),
+(486, 'Remise de peine', 9588, 9436, 835),
+(487, 'Africa blues', 9589, 9436, 841),
+(488, 'Madame le proviseur', 9590, 9436, 835),
+(489, 'Le montage', 9591, 9436, 816),
+(490, 'J\'étais là avant', 9592, 9436, 844),
+(491, 'Le marcheur du pôle', 9593, 9436, 830);
 
 -- --------------------------------------------------------
 
@@ -67,7 +155,35 @@ CREATE TABLE IF NOT EXISTS `editors` (
   `ed_name` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`ed_id`),
   UNIQUE KEY `IDX_EDITORS` (`ed_name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=846 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `editors`
+--
+
+INSERT INTO `editors` (`ed_id`, `ed_name`) VALUES
+(810, 'ACTES SUD'),
+(844, 'ALBIN MICHEL'),
+(809, 'BELFOND'),
+(837, 'FAYARD'),
+(811, 'FLAMMARION'),
+(819, 'FOLIO'),
+(829, 'FRANCE LOISIRS'),
+(822, 'GALLIMARD'),
+(808, 'GRASSET'),
+(833, 'JC LATTES'),
+(816, 'JULLIARD'),
+(841, 'MANYA'),
+(823, 'MARABOUT'),
+(827, 'MÉTAILLIÉ'),
+(818, 'OH EDITIONS'),
+(826, 'P.O.L'),
+(824, 'PAN'),
+(820, 'PLON'),
+(828, 'RAMSAY'),
+(830, 'ROBERT LAFFONT'),
+(835, 'SEUIL'),
+(815, 'STOCK');
 
 -- --------------------------------------------------------
 
@@ -81,7 +197,15 @@ CREATE TABLE IF NOT EXISTS `locations` (
   `loc_city` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`loc_id`),
   UNIQUE KEY `IDX_LOCATIONS` (`loc_city`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9437 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `locations`
+--
+
+INSERT INTO `locations` (`loc_id`, `loc_city`) VALUES
+(9436, 'Hossegor'),
+(9435, 'Pontault');
 
 -- --------------------------------------------------------
 
@@ -128,7 +252,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `confirmpassword` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `confirmed` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `users`
