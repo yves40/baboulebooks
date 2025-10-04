@@ -30,7 +30,7 @@ public class Location {
     Statement stmt = _dbconn.createStatement();
     try {
       stmt.executeUpdate("insert into locations ( loc_city ) " + 
-            "values ( '" + this._city + "' )",
+            "values ( \"" + this._city + "\" )",
             Statement.RETURN_GENERATED_KEYS);   
       ResultSet rs = stmt.getGeneratedKeys();
       if(rs.next()) {
@@ -51,7 +51,7 @@ public class Location {
     if(_dbconn == null) throw new Exception("DB connection is not initialized");
     Statement stmt = _dbconn.createStatement();
     try {
-      stmt.executeQuery("select * from locations where loc_city = '" +  city + "'");   
+      stmt.executeQuery("select * from locations where loc_city = \"" +  city + "\"");   
       ResultSet rs = stmt.getResultSet();
       Location loc = null;
       if(rs.next()) {

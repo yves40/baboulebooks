@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 public class Editor {
 
-  private static String version = "Editor, Oct 03 2025 : 1.02";
+  private static String version = "Editor, 04 2025 : 1.02";
   protected int _id ;
   protected String _name;
   protected static Connection _dbconn = null;
@@ -30,7 +30,7 @@ public class Editor {
     Statement stmt = _dbconn.createStatement();
     try {
       stmt.executeUpdate("insert into editors ( ed_name ) " + 
-            "values ( '" + this._name + "' )",
+            "values ( \"" + this._name + "\" )",
             Statement.RETURN_GENERATED_KEYS);   
       ResultSet rs = stmt.getGeneratedKeys();
       if(rs.next()) {
@@ -52,7 +52,7 @@ public class Editor {
     if(_dbconn == null) throw new Exception("DB connection is not initialized");
     Statement stmt = _dbconn.createStatement();
     try {
-      stmt.executeQuery("select * from editors where ed_name = '" +  name + "'");   
+      stmt.executeQuery("select * from editors where ed_name = \"" +  name + "\"");   
       ResultSet rs = stmt.getResultSet();
       Editor ed = null;
       if(rs.next()) {

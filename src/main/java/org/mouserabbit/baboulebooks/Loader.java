@@ -38,6 +38,10 @@ import org.mouserabbit.baboulebooks.classes.*;
  * @category Test
  * @version 1.01
  * 
+ * babloader -u baboule -p Baboule40 -h localhost -port 3306 -d babouledb -x "D:\ALL\LAB\GIT\JAVA\baboulebooks\data\LivresPONTO.csv" -l 20
+ * babloader -u baboule -p Baboule40 -h localhost -port 3306 -d babouledb -x "D:\ALL\LAB\GIT\JAVA\baboulebooks\data\LivresPONTO.csv" -l 20 -z
+ * babloader -h
+ * 
  */
 public class Loader {
 
@@ -81,7 +85,7 @@ public class Loader {
         try {
             ProcessCommandLine(args);
             // Any xml parameter file to be processed ?
-            if(_xmlparameterfile != null) analyzeXMLParameterFile();
+            if(!_xmlparameterfile.isEmpty()) analyzeXMLParameterFile();
             checkParameters();
             // Summary of some parameters before run
             _logger.info("Maximum number of lines per file : " + 
@@ -265,7 +269,6 @@ public class Loader {
             System.out.println("\n\n");
         }
         catch(SQLException sqle) {
-            // Already inserted, no action
             _logger.error(sqle.getMessage());
         }
     }
@@ -277,6 +280,11 @@ public class Loader {
 
         for (int loop = 0; loop < args.length; ++loop) {
             recognized = false;
+            if (args[loop].equals("-h"))    // Help
+            {
+                Usage();
+                System.exit(0);
+            }
             if (args[loop].equals("-u"))
             {
                 if (loop < args.length) {
@@ -298,7 +306,7 @@ public class Loader {
                     _database = args[++loop];
                 }
             }
-            if (args[loop].equals("-h"))
+            if (args[loop].equals("-host"))
             {
                 if (loop < args.length) {
                     recognized = true;
@@ -423,8 +431,9 @@ public class Loader {
     //   Help user with a short usage message
     //---------------------------------------------------------------------------------------------------
     private static void Usage() {
+        System.out.print("\nUsage: Loader -h");
         System.out.print("\nUsage: Loader -u user -p password -d database -x exceldatafile ");
-        System.out.println(" [ -h host ] [ -port portnumber ] [ -f parameterfile.xml ]  [ -l limit ]");
+        System.out.println(" [ -host host ] [ -port portnumber ] [ -f parameterfile.xml ]  [ -l limit ] [ -z ]");
         System.out.println("\t\t-user, is the username to connect to MySQL.");
         System.out.println("\t\t-password, is the user password to connect to MySQL.");
         System.out.println("\t\t-database, is the DB we want to connect.");
@@ -434,6 +443,7 @@ public class Loader {
         System.out.println("\t\t-x is an excel csv file. Wildcards suported : *.csv");
         System.out.println("\t\t-l maxlines is optional: stop processing input file after maxlines.");
         System.out.println("\t\t-z Empty DB tables before load");
+        System.out.println("\t\t-h Help");
         System.out.println("\t\t");
     }
     //---------------------------------------------------------------------------------------------------

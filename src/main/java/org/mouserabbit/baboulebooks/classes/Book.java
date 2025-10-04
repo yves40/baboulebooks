@@ -5,14 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
 
 import org.apache.logging.log4j.Logger;
 
 public class Book {
 
-  private static String version = "Book, Sep 27 2025 : 1.01";
+  private static String version = "Book, Oct 04 2025 : 1.02";
 
   protected int _id ;
   protected String _title ;
@@ -42,7 +41,6 @@ public class Book {
                 "," + this._location + 
                 ",\"" + this._title + "\"" +
             " )";
-            // _logger.debug("Insert book : " + this._title);
       stmt.executeUpdate(sqlstatement, Statement.RETURN_GENERATED_KEYS);   
       ResultSet rs = stmt.getGeneratedKeys();
       if(rs.next()) {
@@ -50,18 +48,14 @@ public class Book {
       }
       stmt.executeUpdate("commit");
     }
-    catch(SQLSyntaxErrorException sqlsyn) {
-      _logger.error(sqlsyn.getMessage());
-    }
     catch(SQLIntegrityConstraintViolationException sqli) {
-      // Already inserted, no action
-      _logger.debug("Integrity constraint violation : " + this._title);
-    }
-    catch(SQLException sqle) {
-      _logger.debug("SQL exception : " + this._title);
       // Already inserted, get exisiting data
       Book alreadyexists = getBookByTitle(this._title);
       this.set_id(alreadyexists.get_id());
+    }
+    catch(SQLException sqle) {
+      _logger.error("Book.java, SQL exception : " + this._title);
+      _logger.error("Book.java : " + sqle.getMessage());
     }
   }
   // ---------------------------------------------------------------------
@@ -71,7 +65,7 @@ public class Book {
     if(_dbconn == null) throw new Exception("DB connection is not initialized");
     Statement stmt = _dbconn.createStatement();
     try {
-      stmt.executeQuery("select * from books where bk_title = '" +  title + "'");   
+      stmt.executeQuery("select * from books where bk_title = \"" +  title + "\"");   
       ResultSet rs = stmt.getResultSet();
       Book book = null;
       if(rs.next()) {
@@ -129,7 +123,6 @@ public class Book {
       stmt.executeUpdate("commit");
     }
     catch(SQLException sqle) {
-      // Already inserted, no action
       _logger.error("Cannot delete all books : " + sqle.getMessage());
     }
   }

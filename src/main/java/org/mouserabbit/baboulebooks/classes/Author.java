@@ -7,13 +7,12 @@ import java.sql.Statement;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLSyntaxErrorException;
-import java.sql.SQLTimeoutException;
 
 import org.apache.logging.log4j.Logger;
 
 public class Author {
   
-  private static String version = "Location, Oct 03 2025 : 1.13";
+  private static String version = "Location, Oct 04 2025 : 1.13";
   protected int _id ;
   protected String _firstname ;
   protected String _lastname ;
@@ -59,8 +58,8 @@ public class Author {
     if(_dbconn == null) throw new Exception("DB connection is not initialized");
     Statement stmt = _dbconn.createStatement();
     try {
-      stmt.executeQuery("select * from authors where auth_fname = '" +  firstname + "'" +
-                        " and auth_lname = '" +  lastname + "'");   
+      stmt.executeQuery("select * from authors where auth_fname = \"" +  firstname + "\"" +
+                        " and auth_lname = \"" +  lastname + "\"");   
       ResultSet rs = stmt.getResultSet();
       Author author = null;
       if(rs.next()) {
