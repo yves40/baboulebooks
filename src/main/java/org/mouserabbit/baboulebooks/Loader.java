@@ -23,7 +23,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 
 import org.mouserabbit.utilities.helpers.FileScanHelper;
@@ -43,7 +42,7 @@ import org.mouserabbit.baboulebooks.classes.*;
 public class Loader {
 
     // private static final Logger logger = LogManager.getLogger("HelloWorld");
-    private static String version = "Loader, Sep 25 2025 : 1.44";
+    private static String version = "Loader, Oct 04 2025 : 1.45";
     private static String _host = "localhost";
     private static int _port = 3306;
     private static String _user = "";
