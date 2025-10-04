@@ -174,6 +174,7 @@ public class Loader {
                     String lastname = "";
                     String firstname = "";
                     String editor = "";
+                    
 
                     line = myReader.nextLine();
                     if(linecount != 0) {
@@ -183,7 +184,7 @@ public class Loader {
                             if(linedata.countTokens() < TOKENNUMBER) {
                                 location = linedata.nextToken();
                                 id = linedata.nextToken();
-                                _logger.warn("\tLine badly formatted for ID " + id);
+                                _logger.warn("\tInput data line badly formatted for ID " + id + ". Missing fields");
                                 ++formaterrors;
                             }
                             else {
