@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `authors` (
 DROP TABLE IF EXISTS `books`;
 CREATE TABLE IF NOT EXISTS `books` (
   `bk_id` int(11) NOT NULL AUTO_INCREMENT,
-  `bk_title` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `bk_title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `bk_author` int(11) DEFAULT NULL,
   `bk_location` int(11) DEFAULT NULL,
   `bk_editor` int(11) DEFAULT NULL,
