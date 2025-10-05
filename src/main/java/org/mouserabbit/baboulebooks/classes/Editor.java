@@ -36,7 +36,7 @@ public class Editor {
       if(rs.next()) {
         this._id = rs.getInt(1);
       }
-      stmt.executeUpdate("commit");
+      // stmt.executeUpdate("commit");
     }
     // If duplicate Editor, fill this object with existing data
     catch(SQLIntegrityConstraintViolationException sqli) {

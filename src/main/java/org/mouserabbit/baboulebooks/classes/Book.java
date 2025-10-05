@@ -120,7 +120,7 @@ public class Book {
     try {
       int i = stmt.executeUpdate();
       _logger.info("\tDeleted " + i + " Books record(s)");
-      stmt.executeUpdate("commit");
+      // stmt.executeUpdate("commit");
     }
     catch(SQLException sqle) {
       _logger.error("Cannot delete all books : " + sqle.getMessage());

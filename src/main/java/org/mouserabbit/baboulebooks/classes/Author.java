@@ -39,7 +39,7 @@ public class Author {
       if(rs.next()) {
         this._id = rs.getInt(1);
       }
-      stmt.executeUpdate("commit");
+      // stmt.executeUpdate("commit");
     }
     catch(SQLIntegrityConstraintViolationException sqli) {
       // Already inserted, get exisiting data

@@ -46,7 +46,7 @@ import org.mouserabbit.baboulebooks.classes.*;
 public class Loader {
 
     // private static final Logger logger = LogManager.getLogger("HelloWorld");
-    private static String version = "Loader, Oct 05 2025 : 1.46";
+    private static String version = "Loader, Oct 05 2025 : 1.47";
     private static String _host = "localhost";
     private static int _port = 3306;
     private static String _user = "";
@@ -83,20 +83,32 @@ public class Loader {
         }
         // Now check command line usage
         try {
+            // -------------------------------------------------------------------------
+            // Get command line parameters
+            // -------------------------------------------------------------------------
             ProcessCommandLine(args);
             // Any xml parameter file to be processed ?
             if(!_xmlparameterfile.isEmpty()) analyzeXMLParameterFile();
+            // -------------------------------------------------------------------------
+            // Fial verification
+            // -------------------------------------------------------------------------
             checkParameters();
             // Summary of some parameters before run
             _logger.info("Maximum number of lines per file : " + 
                         (_maxlines == 0 ? "No limit" : _maxlines));
             _logger.info("Purge DB tables before run ?  : " + 
                         (_zerodata == true ? "YES" : "NO"));
+            // -------------------------------------------------------------------------
             // Connect the DB 
+            // -------------------------------------------------------------------------
             String connectstring = "jdbc:mysql://" +  _host + ":" + _port + "/" + _database + "?" + "user=" + _user + "&password=" + _password;
             _logger.info("Connection : " + connectstring);
             _dbconn = DriverManager.getConnection(connectstring);
+            Statement autocommitoff = _dbconn.createStatement();
+            autocommitoff.execute("set autocommit=0"); 
+            // -------------------------------------------------------------------------
             // Set up data objects static properties
+            // -------------------------------------------------------------------------
             Location.set_dbconn(_dbconn);
             Location.set_logger(_logger);
             Author.set_dbconn(_dbconn);
@@ -107,14 +119,19 @@ public class Loader {
             Book.set_logger(_logger);
             // Purge ? 
             if(_zerodata) {
+                // Commit done in objects methods
                 Book.DeleteAll();
                 Location.DeleteAll();
                 Author.DeleteAll();
                 Editor.DeleteAll();
             }
+            // -------------------------------------------------------------------------
             // Process input file(s)
+            // -------------------------------------------------------------------------
             ProcessDataFiles();
+            // -------------------------------------------------------------------------
             // Some report
+            // -------------------------------------------------------------------------
             reportRun();
             // Uncomment if you want to use this new utility class ;-)
             // AnotherMethodToScanFiles("data");
@@ -161,6 +178,10 @@ public class Loader {
             int loaded = 0;         // Number of valid lines processed
             int formaterrors = 0;   // Number of badly formatted lines
             Location newlocation = null;
+
+            // Start transaction
+            Statement transaction = _dbconn.createStatement();
+            transaction.execute("set transaction read write"); 
 
             try (Scanner myReader = new Scanner(oneFile)) {
                 while (myReader.hasNextLine()) {
@@ -222,12 +243,16 @@ public class Loader {
                     }
                     ++linecount;
                 }
+                transaction.execute("commit");
                 _logger.info("\tNumber of data lines in file : " + (linecount-1));
                 _logger.info("\tInserted  : " +  loaded + " line(s)");
                 _logger.info("\tRejected  " + oneFile.getAbsolutePath() + " : " + formaterrors);
             } 
             catch (FileNotFoundException e) {
                 _logger.error(e.getMessage());
+            }
+            catch(SQLException sqle) {
+                transaction.execute("rollback"); 
             }
         }
     }
