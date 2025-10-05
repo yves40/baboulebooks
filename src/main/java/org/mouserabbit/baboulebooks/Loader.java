@@ -38,8 +38,8 @@ import org.mouserabbit.baboulebooks.classes.*;
  * @category Test
  * @version 1.01
  * 
- * babloader -u baboule -p Baboule40 -h localhost -port 3306 -d babouledb -x "D:\ALL\LAB\GIT\JAVA\baboulebooks\data\LivresPONTO.csv" -l 20
- * babloader -u baboule -p Baboule40 -h localhost -port 3306 -d babouledb -x "D:\ALL\LAB\GIT\JAVA\baboulebooks\data\LivresPONTO.csv" -l 20 -z
+ * babloader -u baboule -p Baboule40 -host localhost -port 3306 -d babouledb -x "D:\ALL\LAB\GIT\JAVA\baboulebooks\data\LivresPONTO.csv" -l 20
+ * babloader -u baboule -p Baboule40 -host localhost -port 3306 -d babouledb -x "D:\ALL\LAB\GIT\JAVA\baboulebooks\data\LivresPONTO.csv" -l 20 -z
  * babloader -h
  * 
  */
