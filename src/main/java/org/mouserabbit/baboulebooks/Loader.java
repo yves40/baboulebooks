@@ -46,7 +46,7 @@ import org.mouserabbit.baboulebooks.classes.*;
 public class Loader {
 
     // private static final Logger logger = LogManager.getLogger("HelloWorld");
-    private static String version = "Loader, Oct 04 2025 : 1.45";
+    private static String version = "Loader, Oct 05 2025 : 1.46";
     private static String _host = "localhost";
     private static int _port = 3306;
     private static String _user = "";
@@ -70,7 +70,7 @@ public class Loader {
         System.setProperty("log4j2.configurationFile", System.getenv("log4j2.configurationFile"));
         _logger = LogManager.getLogger();
         // Uncomment to check the java classpath
-        System.out.println(System.getProperty("java.class.path"));        
+        // System.out.println(System.getProperty("java.class.path"));        
         // Start work 
         System.out.print("\n\n\n");
         _logger.info(version);
