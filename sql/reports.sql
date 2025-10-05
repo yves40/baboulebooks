@@ -22,10 +22,10 @@ select a.auth_lname, a.auth_fname, b.bk_title,  e.ed_name, l.loc_city
   order by a.auth_lname,  a.auth_fname asc;
 -- Books count list by author
 use babouledb;
-select a.auth_lname, a.auth_fname, count(b.bk_id) Livres 
-  from books b, authors a
+select count(b.bk_id) Livres, a.auth_lname, a.auth_fname
+  from babouledb.books b, babouledb.authors a
   where b.bk_author = a.auth_id
   group by a.auth_lname, a.auth_fname
-  order by Livres desc;
+  order by Livres desc , a.auth_lname asc;
 
   
