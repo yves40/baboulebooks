@@ -104,6 +104,9 @@ public class Editor {
   // ---------------------------------------------------------------------
   // Setters & Getters
   // ---------------------------------------------------------------------
+  public static String getVersion() {
+    return version;
+  }
   public static void set_dbconn(Connection _dbconn) {
     Editor._dbconn = _dbconn;
   }

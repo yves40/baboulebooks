@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 public class Book {
 
-  private static String version = "Book, Oct 04 2025 : 1.02";
+  private static String version = "Book, Oct 07 2025 : 1.03";
 
   protected int _id ;
   protected String _title ;
@@ -132,7 +132,12 @@ public class Book {
   public int get_id() {
     return _id;
   }
-
+  public static String getVersion() {
+    return version;
+  }
+  public static void setVersion(String version) {
+    Book.version = version;
+  }
   public void set_id(int _id) {
     this._id = _id;
   }

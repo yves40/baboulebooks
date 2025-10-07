@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 public class Author {
   
-  private static String version = "Location, Oct 04 2025 : 1.13";
+  private static String version = "Location, Oct 07 2025 : 1.14";
   protected int _id ;
   protected String _firstname ;
   protected String _lastname ;
