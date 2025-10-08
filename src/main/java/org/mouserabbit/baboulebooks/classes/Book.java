@@ -8,10 +8,12 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 
 import org.apache.logging.log4j.Logger;
+import org.mouserabbit.baboulebooks.classes.DBsingleton;
+import org.mouserabbit.baboulebooks.classes.LoggerSingleton;
 
 public class Book {
 
-  private static String version = "Book, Oct 07 2025 : 1.03";
+  private static String version = "Book, Oct 07 2025 : 1.04";
 
   protected int _id ;
   protected String _title ;
@@ -19,10 +21,27 @@ public class Book {
   protected int _location ;
   protected int _editor ;
 
-  protected static Connection _dbconn = null;
-  protected static Logger _logger = null;
+  protected Connection _dbconn = null;
+  protected Logger _logger = null;
+
+  public Book() { 
+    _logger = LoggerSingleton.getInstance().get_logger();
+    try {
+      _dbconn = DBsingleton.getInstance().get_dbconn();
+    }
+    catch (Exception e) {
+      _logger.error(e.getMessage());
+    }
+  }
 
   public Book(String _title) {
+    _logger = LoggerSingleton.getInstance().get_logger();
+    try {
+      _dbconn = DBsingleton.getInstance().get_dbconn();
+    }
+    catch (Exception e) {
+      _logger.error(e.getMessage());
+    }
     this._title = Normalize(_title);
   }
   // ---------------------------------------------------------------------
@@ -113,7 +132,7 @@ public class Book {
   // ---------------------------------------------------------------------
   // Cleanup DB table
   // ---------------------------------------------------------------------
-  public static void DeleteAll() throws Exception {
+  public void DeleteAll() throws Exception {
     if(_dbconn == null) throw new Exception("DB connection is not initialized");
     _logger.info("Delete all books");
     PreparedStatement stmt = _dbconn.prepareStatement("delete from books");
@@ -132,11 +151,8 @@ public class Book {
   public int get_id() {
     return _id;
   }
-  public static String getVersion() {
+  public String getVersion() {
     return version;
-  }
-  public static void setVersion(String version) {
-    Book.version = version;
   }
   public void set_id(int _id) {
     this._id = _id;
@@ -154,12 +170,6 @@ public class Book {
     return _author;
   }
 
-  public static void set_dbconn(Connection _dbconn) {
-    Book._dbconn = _dbconn;
-  }
-  public static void set_logger(Logger _logger) {
-    Book._logger = _logger;
-  }
   public void set_author(int _author) {
     this._author = _author;
   }

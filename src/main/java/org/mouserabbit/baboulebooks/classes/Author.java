@@ -7,21 +7,40 @@ import java.sql.Statement;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLSyntaxErrorException;
+import org.mouserabbit.baboulebooks.classes.DBsingleton;
+import org.mouserabbit.baboulebooks.classes.LoggerSingleton;
 
 import org.apache.logging.log4j.Logger;
 
 public class Author {
   
-  private static String version = "Location, Oct 07 2025 : 1.14";
+  private static String version = "Location, Oct 07 2025 : 1.16";
   protected int _id ;
   protected String _firstname ;
   protected String _lastname ;
-  protected static Connection _dbconn = null;
-  protected static Logger _logger = null;
+  protected Connection _dbconn = null;
+  protected Logger _logger = null;
 
   
+  public Author() { 
+    _logger = LoggerSingleton.getInstance().get_logger();
+    try {
+      _dbconn = DBsingleton.getInstance().get_dbconn();
+      Normalize( _firstname, _lastname);
+    }
+    catch (Exception e) {
+      _logger.error(e.getMessage());
+    }
+  }
   public Author(String _firstname, String _lastname) {
-    String concat = Normalize( _firstname, _lastname);
+    _logger = LoggerSingleton.getInstance().get_logger();
+    try {
+      _dbconn = DBsingleton.getInstance().get_dbconn();
+      Normalize( _firstname, _lastname);
+    }
+    catch (Exception e) {
+      _logger.error(e.getMessage());
+    }
   }
   // ---------------------------------------------------------------------
   // Insert Author data
@@ -94,7 +113,7 @@ public class Author {
   // ---------------------------------------------------------------------
   // Cleanup DB table
   // ---------------------------------------------------------------------
-  public static void DeleteAll() throws Exception {
+  public void DeleteAll() throws Exception {
     if(_dbconn == null) throw new Exception("DB connection is not initialized");
     _logger.info("Delete all authors");
     PreparedStatement stmt = _dbconn.prepareStatement("delete from authors");
@@ -112,17 +131,16 @@ public class Author {
   // ---------------------------------------------------------------------
   // Normalize author data
   // ---------------------------------------------------------------------
-  protected String Normalize(String firstname, String lastname) {
+  protected void Normalize(String firstname, String lastname) {
     try {
       String normalized = firstname.strip();
       _firstname = normalized.substring(0, 1).toUpperCase() +  normalized.substring(1).toLowerCase();
       normalized = lastname.strip();
       _lastname = normalized.toUpperCase();
-      return _firstname + "." + _lastname;
+      return;
     }
     catch(Exception e) {
       System.out.println(e.getMessage());
-      return "";
     }
   }
   // ---------------------------------------------------------------------
@@ -131,7 +149,7 @@ public class Author {
   public String get_firstname() {
     return _firstname;
   }
-  public static String getVersion() {
+  public String getVersion() {
     return version;
   }
   public int get_id() {
@@ -149,11 +167,5 @@ public class Author {
   }
   public void set_lastname(String _lastname) {
     this._lastname = _lastname;
-  }
-  public static void set_dbconn(Connection _dbconn) {
-    Author._dbconn = _dbconn;
-  }
-  public static void set_logger(Logger _logger) {
-    Author._logger = _logger;
   }
 }

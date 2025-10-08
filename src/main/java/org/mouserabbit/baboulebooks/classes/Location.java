@@ -7,16 +7,35 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import org.apache.logging.log4j.Logger;
+import org.mouserabbit.baboulebooks.classes.DBsingleton;
+import org.mouserabbit.baboulebooks.classes.LoggerSingleton;
 
 public class Location {
 
-  private static String version = "Location, Oct 03 2025 : 1.13";
+  private static String version = "Location, Oct 07 2025 : 1.14";
   protected int _id ;
   protected String _city;
-  protected static Connection _dbconn = null;
-  protected static Logger _logger = null;
+  protected Connection _dbconn = null;
+  protected Logger _logger = null;
+
+  public Location() {
+    _logger = LoggerSingleton.getInstance().get_logger();
+    try {
+      _dbconn = DBsingleton.getInstance().get_dbconn();
+    }
+    catch (Exception e) {
+      _logger.error(e.getMessage());
+    }
+  }
 
   public Location(String _city) {
+    _logger = LoggerSingleton.getInstance().get_logger();
+    try {
+      _dbconn = DBsingleton.getInstance().get_dbconn();
+    }
+    catch (Exception e) {
+      _logger.error(e.getMessage());
+    }
     this._city = Normalize(_city);
   }
 
@@ -86,7 +105,7 @@ public class Location {
   // ---------------------------------------------------------------------
   // Cleanup DB table
   // ---------------------------------------------------------------------
-  public static void DeleteAll() throws Exception {
+  public void DeleteAll() throws Exception {
     if(_dbconn == null) throw new Exception("DB connection is not initialized");
     _logger.info("Delete all locations");
     PreparedStatement stmt = _dbconn.prepareStatement("delete from locations");
@@ -103,16 +122,10 @@ public class Location {
   // ---------------------------------------------------------------------
   // Setters & Getters
   // ---------------------------------------------------------------------
-  public static void set_dbconn(Connection _dbconn) {
-    Location._dbconn = _dbconn;
-  }
-  public static void set_logger(Logger _logger) {
-    Location._logger = _logger;
-  }
   public int get_id() {
     return _id;
   }
-  public static String getVersion() {
+  public String getVersion() {
     return version;
   }
   public void set_id(int _id) {

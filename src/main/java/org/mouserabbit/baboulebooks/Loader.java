@@ -45,8 +45,7 @@ import org.mouserabbit.baboulebooks.classes.*;
  */
 public class Loader {
 
-    // private static final Logger logger = LogManager.getLogger("HelloWorld");
-    private static String version = "Loader, Oct 05 2025 : 1.47";
+    private static String version = "Loader, Oct 07 2025 : 1.49";
     private static String _host = "localhost";
     private static int _port = 3306;
     private static String _user = "";
@@ -55,7 +54,7 @@ public class Loader {
     private static String _xmlparameterfile = "";
     private static String _exceldatafile = "";
     private static int _maxlines = 0;               // Process only n lines
-    private static boolean _zerodata = false;        // Empty tables before insertion ?                            
+    private static boolean _zerodata = false;       // Empty tables before insertion ?
     private static Connection _dbconn = null;
     private static Logger _logger = null;
     private static final int TOKENNUMBER = 6;
@@ -67,8 +66,10 @@ public class Loader {
         // System.setProperty("log4j2.debug", "true");
         // Point to the configuration file. We'll take the name from ENV which is defined in 
         // settings.json
-        System.setProperty("log4j2.configurationFile", System.getenv("log4j2.configurationFile"));
-        _logger = LogManager.getLogger();
+        /*
+         * Get logger
+         */
+        _logger = LoggerSingleton.getInstance().get_logger();
         // Uncomment to check the java classpath
         // System.out.println(System.getProperty("java.class.path"));        
         // Start work 
@@ -90,7 +91,7 @@ public class Loader {
             // Any xml parameter file to be processed ?
             if(!_xmlparameterfile.isEmpty()) analyzeXMLParameterFile();
             // -------------------------------------------------------------------------
-            // Fial verification
+            // Final verification
             // -------------------------------------------------------------------------
             checkParameters();
             // Summary of some parameters before run
@@ -101,6 +102,7 @@ public class Loader {
             // -------------------------------------------------------------------------
             // Connect the DB 
             // -------------------------------------------------------------------------
+            _dbconn = DBsingleton.getInstance(_host, _port, _database, _user, _password).get_dbconn();
             String connectstring = "jdbc:mysql://" +  _host + ":" + _port + "/" + _database + "?" + "user=" + _user + "&password=" + _password;
             _logger.info("Connection : " + connectstring);
             _dbconn = DriverManager.getConnection(connectstring);
@@ -109,21 +111,13 @@ public class Loader {
             // -------------------------------------------------------------------------
             // Set up data objects static properties
             // -------------------------------------------------------------------------
-            Location.set_dbconn(_dbconn);
-            Location.set_logger(_logger);
-            Author.set_dbconn(_dbconn);
-            Author.set_logger(_logger); 
-            Editor.set_dbconn(_dbconn);
-            Editor.set_logger(_logger);
-            Book.set_dbconn(_dbconn);
-            Book.set_logger(_logger);
             // Purge ? 
             if(_zerodata) {
                 // Commit done in objects methods
-                Book.DeleteAll();
-                Location.DeleteAll();
-                Author.DeleteAll();
-                Editor.DeleteAll();
+                new Book().DeleteAll();
+                new Location().DeleteAll();
+                new Author().DeleteAll();
+                new Editor().DeleteAll();
             }
             // -------------------------------------------------------------------------
             // Process input file(s)
@@ -246,7 +240,7 @@ public class Loader {
                 transaction.execute("commit");
                 _logger.info("\tNumber of data lines in file : " + (linecount-1));
                 _logger.info("\tInserted  : " +  loaded + " line(s)");
-                _logger.info("\tRejected  " + oneFile.getAbsolutePath() + " : " + formaterrors);
+                _logger.info("\tRejected  : " + formaterrors);
             } 
             catch (FileNotFoundException e) {
                 _logger.error(e.getMessage());

@@ -7,17 +7,36 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 
+import org.mouserabbit.baboulebooks.classes.DBsingleton;
+import org.mouserabbit.baboulebooks.classes.LoggerSingleton;
+
 import org.apache.logging.log4j.Logger;
 
 public class Editor {
 
-  private static String version = "Editor, 04 2025 : 1.02";
+  private static String version = "Editor, 07 2025 : 1.03";
   protected int _id ;
   protected String _name;
-  protected static Connection _dbconn = null;
-  protected static Logger _logger = null;
+  protected Connection _dbconn = null;
+  protected Logger _logger = null;
 
+  public Editor() {
+    _logger = LoggerSingleton.getInstance().get_logger();
+    try {
+      _dbconn = DBsingleton.getInstance().get_dbconn();
+    }
+    catch (Exception e) {
+      _logger.error(e.getMessage());
+    }
+  }
   public Editor(String _name) {
+    _logger = LoggerSingleton.getInstance().get_logger();
+    try {
+      _dbconn = DBsingleton.getInstance().get_dbconn();
+    }
+    catch (Exception e) {
+      _logger.error(e.getMessage());
+    }
     this._name = Normalize(_name);
   }
   // ---------------------------------------------------------------------
@@ -87,7 +106,7 @@ public class Editor {
   // ---------------------------------------------------------------------
   // Cleanup DB table
   // ---------------------------------------------------------------------
-  public static void DeleteAll() throws Exception {
+  public void DeleteAll() throws Exception {
     if(_dbconn == null) throw new Exception("DB connection is not initialized");
     _logger.info("Delete all editors");
     PreparedStatement stmt = _dbconn.prepareStatement("delete from editors");
@@ -104,14 +123,8 @@ public class Editor {
   // ---------------------------------------------------------------------
   // Setters & Getters
   // ---------------------------------------------------------------------
-  public static String getVersion() {
+  public String getVersion() {
     return version;
-  }
-  public static void set_dbconn(Connection _dbconn) {
-    Editor._dbconn = _dbconn;
-  }
-  public static void set_logger(Logger _logger) {
-    Editor._logger = _logger;
   }
   public int get_id() {
     return _id;
