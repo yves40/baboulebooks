@@ -24,7 +24,7 @@ public class Book {
   protected Connection _dbconn = null;
   protected Logger _logger = null;
 
-  public Book() { 
+  public Book() throws Exception { 
     _logger = LoggerSingleton.getInstance().get_logger();
     try {
       _dbconn = DBsingleton.getInstance().get_dbconn();
@@ -34,7 +34,7 @@ public class Book {
     }
   }
 
-  public Book(String _title) {
+  public Book(String _title) throws Exception {
     _logger = LoggerSingleton.getInstance().get_logger();
     try {
       _dbconn = DBsingleton.getInstance().get_dbconn();

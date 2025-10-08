@@ -20,7 +20,7 @@ public class Editor {
   protected Connection _dbconn = null;
   protected Logger _logger = null;
 
-  public Editor() {
+  public Editor() throws Exception {
     _logger = LoggerSingleton.getInstance().get_logger();
     try {
       _dbconn = DBsingleton.getInstance().get_dbconn();
@@ -29,7 +29,7 @@ public class Editor {
       _logger.error(e.getMessage());
     }
   }
-  public Editor(String _name) {
+  public Editor(String _name) throws Exception {
     _logger = LoggerSingleton.getInstance().get_logger();
     try {
       _dbconn = DBsingleton.getInstance().get_dbconn();

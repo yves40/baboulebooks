@@ -45,7 +45,7 @@ import org.mouserabbit.baboulebooks.classes.*;
  */
 public class Loader {
 
-    private static String version = "Loader, Oct 07 2025 : 1.49";
+    private static String version = "Loader, Oct 08 2025 : 1.50";
     private static String _host = "localhost";
     private static int _port = 3306;
     private static String _user = "";
@@ -69,19 +69,20 @@ public class Loader {
         /*
          * Get logger
          */
-        _logger = LoggerSingleton.getInstance().get_logger();
+        try {
+            _logger = LoggerSingleton.getInstance().get_logger();
+            _logger.debug("The log4j xml parameter file is set to " + System.getenv("log4j2.configurationFile"));
+        }
+        catch ( Exception e) {
+            System.out.print("You must pass log4j2.configurationFile environment variable on the command line\n");
+            System.out.print("java -Dlog4j2.configurationFile=\"YOURLOCATION\\log4j.xml\" YOURCLASS\n");
+            System.exit(1);
+        }
         // Uncomment to check the java classpath
         // System.out.println(System.getProperty("java.class.path"));        
         // Start work 
         System.out.print("\n\n\n");
         _logger.info(version);
-        String logfile = System.getenv("log4j2.configurationFile");
-        _logger.debug("The log4j xml parameter file is set to " + logfile);
-        if ( logfile == null ){
-            System.out.print("You must pass log4j2.configurationFile environment variable on the command line\n");
-            System.out.print("java -Dlog4j2.configurationFile=\"YOURLOCATION\\log4j.xml\" YOURCLASS\n");
-            throw new Exception("No log4j parameter file");
-        }
         // Now check command line usage
         try {
             // -------------------------------------------------------------------------

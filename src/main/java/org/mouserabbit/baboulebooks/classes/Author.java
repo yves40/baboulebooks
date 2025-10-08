@@ -22,7 +22,7 @@ public class Author {
   protected Logger _logger = null;
 
   
-  public Author() { 
+  public Author() throws Exception { 
     _logger = LoggerSingleton.getInstance().get_logger();
     try {
       _dbconn = DBsingleton.getInstance().get_dbconn();
@@ -32,7 +32,7 @@ public class Author {
       _logger.error(e.getMessage());
     }
   }
-  public Author(String _firstname, String _lastname) {
+  public Author(String _firstname, String _lastname) throws Exception {
     _logger = LoggerSingleton.getInstance().get_logger();
     try {
       _dbconn = DBsingleton.getInstance().get_dbconn();

@@ -18,7 +18,7 @@ public class Location {
   protected Connection _dbconn = null;
   protected Logger _logger = null;
 
-  public Location() {
+  public Location() throws Exception {
     _logger = LoggerSingleton.getInstance().get_logger();
     try {
       _dbconn = DBsingleton.getInstance().get_dbconn();
@@ -28,7 +28,7 @@ public class Location {
     }
   }
 
-  public Location(String _city) {
+  public Location(String _city) throws Exception {
     _logger = LoggerSingleton.getInstance().get_logger();
     try {
       _dbconn = DBsingleton.getInstance().get_dbconn();
