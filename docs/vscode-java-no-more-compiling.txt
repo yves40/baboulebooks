@@ -1,0 +1,5 @@
+Open VS Code.
+Press Cmd + Shift + P to open the Command Palette.
+In the Command Palette, type Java: Clean the Java Language Server Workspace.
+Select Java: Clean the Java Language Server Workspace from the list of options.
+VS Code will prompt you to confirm the operation.
