@@ -136,6 +136,22 @@ CREATE TABLE IF NOT EXISTS `users_roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
+-- Structure de la table `users_sessions`
+--
+
+DROP TABLE IF EXISTS `sessions`;
+CREATE TABLE IF NOT EXISTS `sessions` (
+  `sessionid` int(11) NOT NULL AUTO_INCREMENT,
+  `userid` int(11) NOT NULL,
+  `created` datetime NOT NULL,
+  `expired` datetime NOT NULL,
+  PRIMARY KEY (`sessionid`),
+  KEY `IDX_USERID` (`userid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `sessions`ADD CONSTRAINT `FK_USER` FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
 -- Contraintes pour les tables déchargées
 --
 
