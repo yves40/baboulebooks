@@ -23,24 +23,7 @@ SET time_zone = "+00:00";
 
 -- --------------------------------------------------------
 
---
--- Structure de la table `roles`
---
-
-DROP TABLE IF EXISTS `roles`;
-CREATE TABLE IF NOT EXISTS `roles` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `level` int(11) NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `roles`
---
-
-INSERT INTO `roles` (`id`, `name`, `level`, `description`) VALUES
+INSERT INTO `roles` (`role_id`, `role_name`, `role_level`, `role_description`) VALUES
 (1, 'ROLE_ADMINISTRATOR', 100, 'Agregates all admin roles'),
 (2, 'ROLE_ADMIN', 90, 'Top level admin role, full privileges'),
 (3, 'ROLE_ADMIN_SITE', 90, 'Top level admin role, full privileges'),

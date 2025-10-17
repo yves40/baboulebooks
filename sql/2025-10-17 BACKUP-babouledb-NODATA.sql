@@ -21,13 +21,22 @@ SET time_zone = "+00:00";
 -- Base de données : `babouledb`
 --
 
--- --------------------------------------------------------
-
---
--- Structure de la table `authors`
---
-
+START TRANSACTION;
+DELETE FROM sessions;
+DELETE FROM users_roles;
+DELETE FROM users;
+DELETE FROM roles;
+DROP TABLE IF EXISTS `books`;
 DROP TABLE IF EXISTS `authors`;
+DROP TABLE IF EXISTS `editors`;
+DROP TABLE IF EXISTS `locations`;
+DROP TABLE IF EXISTS `users_roles`;
+DROP TABLE IF EXISTS `roles`;
+DROP TABLE IF EXISTS `sessions`;
+DROP TABLE IF EXISTS `users`;
+COMMIT;
+
+START TRANSACTION;
 CREATE TABLE IF NOT EXISTS `authors` (
   `auth_id` int(11) NOT NULL AUTO_INCREMENT,
   `auth_fname` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -36,13 +45,6 @@ CREATE TABLE IF NOT EXISTS `authors` (
   UNIQUE KEY `IDX_AUTHORS` (`auth_lname`,`auth_fname`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Structure de la table `books`
---
-
-DROP TABLE IF EXISTS `books`;
 CREATE TABLE IF NOT EXISTS `books` (
   `bk_id` int(11) NOT NULL AUTO_INCREMENT,
   `bk_title` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -56,13 +58,6 @@ CREATE TABLE IF NOT EXISTS `books` (
   KEY `FK_LOCATION` (`bk_location`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Structure de la table `editors`
---
-
-DROP TABLE IF EXISTS `editors`;
 CREATE TABLE IF NOT EXISTS `editors` (
   `ed_id` int(11) NOT NULL AUTO_INCREMENT,
   `ed_name` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -70,13 +65,6 @@ CREATE TABLE IF NOT EXISTS `editors` (
   UNIQUE KEY `IDX_EDITORS` (`ed_name`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Structure de la table `locations`
---
-
-DROP TABLE IF EXISTS `locations`;
 CREATE TABLE IF NOT EXISTS `locations` (
   `loc_id` int(11) NOT NULL AUTO_INCREMENT,
   `loc_city` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -84,97 +72,60 @@ CREATE TABLE IF NOT EXISTS `locations` (
   UNIQUE KEY `IDX_LOCATIONS` (`loc_city`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Structure de la table `roles`
---
-
-DROP TABLE IF EXISTS `roles`;
 CREATE TABLE IF NOT EXISTS `roles` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `level` int(11) NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `role_id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_name` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role_level` int(11) NOT NULL,
+  `role_description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
 
---
--- Structure de la table `sessions`
---
-
-DROP TABLE IF EXISTS `sessions`;
 CREATE TABLE IF NOT EXISTS `sessions` (
-  `sessionid` int(11) NOT NULL AUTO_INCREMENT,
-  `userid` int(11) NOT NULL,
-  `created` datetime NOT NULL,
-  `expired` datetime NOT NULL,
-  PRIMARY KEY (`sessionid`),
-  KEY `IDX_USERID` (`userid`)
+  `ses_id` int(11) NOT NULL AUTO_INCREMENT,
+  `ses_userid` int(11) NOT NULL,
+  `ses_created` datetime NOT NULL,
+  `ses_expired` datetime NOT NULL,
+  PRIMARY KEY (`ses_id`),
+  KEY `IDX_USERID` (`ses_userid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Structure de la table `users`
---
-
-DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `firstname` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `lastname` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `address` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created` datetime NOT NULL,
-  `lastlogin` datetime DEFAULT NULL,
-  `confirmpassword` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `confirmed` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `usr_id` int(11) NOT NULL AUTO_INCREMENT,
+  `usr_firstname` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `usr_lastname` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `usr_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `usr_address` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `usr_password` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `usr_confirmpassword` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `usr_created` datetime NOT NULL,
+  `usr_lastlogin` datetime DEFAULT NULL,
+  `usr_confirmed` datetime DEFAULT NULL,
+  PRIMARY KEY (`usr_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
 
---
--- Structure de la table `users_roles`
---
-
-DROP TABLE IF EXISTS `users_roles`;
 CREATE TABLE IF NOT EXISTS `users_roles` (
-  `users_id` int(11) NOT NULL,
-  `roles_id` int(11) NOT NULL,
-  PRIMARY KEY (`users_id`,`roles_id`),
-  KEY `IDX_51498A8E67B3B43D` (`users_id`),
-  KEY `IDX_51498A8E38C751C4` (`roles_id`)
+  `ur_userid` int(11) NOT NULL,
+  `ur_roleid` int(11) NOT NULL,
+  PRIMARY KEY (`ur_userid`, `ur_roleid`),
+  KEY `IDX_51498A8E67B3B43D` (`ur_userid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Contraintes pour les tables déchargées
---
-
---
--- Contraintes pour la table `books`
+-- Contraintes 
 --
 ALTER TABLE `books`
   ADD CONSTRAINT `FK_AUTHOR` FOREIGN KEY (`bk_author`) REFERENCES `authors` (`auth_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `FK_EDITOR` FOREIGN KEY (`bk_editor`) REFERENCES `editors` (`ed_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `FK_LOCATION` FOREIGN KEY (`bk_location`) REFERENCES `locations` (`loc_id`) ON DELETE CASCADE;
 
---
--- Contraintes pour la table `sessions`
---
 ALTER TABLE `sessions`
-  ADD CONSTRAINT `FK_USER` FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `FK_USER` FOREIGN KEY (`ses_userid`) REFERENCES `users` (`usr_id`) ON DELETE CASCADE;
 
---
--- Contraintes pour la table `users_roles`
---
 ALTER TABLE `users_roles`
-  ADD CONSTRAINT `FK_51498A8E38C751C4` FOREIGN KEY (`roles_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `FK_51498A8E67B3B43D` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `FK_51498A8E38C751C4` FOREIGN KEY (`ur_roleid`) REFERENCES `roles` (`role_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_51498A8E67B3B43D` FOREIGN KEY (`ur_userid`) REFERENCES `users` (`usr_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
