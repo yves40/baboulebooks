@@ -45,7 +45,7 @@ import org.mouserabbit.baboulebooks.classes.*;
  */
 public class Loader {
 
-    private static String version = "Loader, Oct 08 2025 : 1.50";
+    private static String version = "Loader, Oct 10 2025 : 1.51";
     private static String _host = "localhost";
     private static int _port = 3306;
     private static String _user = "";
