@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS `sessions` (
   PRIMARY KEY (`ses_id`),
   KEY `IDX_USERID` (`ses_userid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+ALTER TABLE sessions AUTO_INCREMENT=7363;
 
 CREATE TABLE IF NOT EXISTS `users` (
   `usr_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -103,7 +104,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `usr_confirmed` datetime DEFAULT NULL,
   PRIMARY KEY (`usr_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
+ALTER TABLE users AUTO_INCREMENT=3462;
 
 CREATE TABLE IF NOT EXISTS `users_roles` (
   `ur_userid` int(11) NOT NULL,
