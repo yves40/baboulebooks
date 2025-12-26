@@ -27,5 +27,10 @@ select count(b.bk_id) Livres, a.auth_lname, a.auth_fname
   where b.bk_author = a.auth_id
   group by a.auth_lname, a.auth_fname
   order by Livres desc , a.auth_lname asc;
+select count(b.bk_id) bookcount , e.ed_name
+  from babouledb.books b, babouledb.editors e
+  where b.bk_editor = e.ed_id 
+  group by e.ed_name 
+  order by bookcount desc , e.ed_name asc limit 10
 
   
