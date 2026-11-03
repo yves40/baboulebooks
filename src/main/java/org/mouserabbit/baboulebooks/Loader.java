@@ -43,7 +43,7 @@ import org.mouserabbit.baboulebooks.classes.*;
  */
 public class Loader {
 
-    private static String version = "Loader, Oct 30 2026 : 1.52";
+    private static String version = "Loader, Nov 03 2026 : 1.53";
     private static String _host = "localhost";
     private static int _port = 3306;
     private static String _user = "";
@@ -193,38 +193,47 @@ public class Loader {
                             if(linedata.countTokens() < TOKENNUMBER) {
                                 location = linedata.nextToken();
                                 id = linedata.nextToken();
-                                _logger.warn("\tInput data line badly formatted for ID " + id + ". Missing fields");
+                                _logger.warn("Input data badly formatted for ID " + id + ". Missing fields");
+                                System.out.println("\t" + line);
                                 ++formaterrors;
                             }
                             else {
-                                // Insert Data : 4 tables
+                                // All fields present, check content
                                 location = linedata.nextToken();
-                                if(newlocation == null) {   // 1st data line ? 
-                                    newlocation = new Location(location);
-                                    newlocation.Insert();
-                                }
-                                else {
-                                    if ( ! location.equals(newlocation.get_city())) {
-                                        newlocation = new Location(location);
-                                        newlocation.Insert();
-                                    }
-                                }
                                 id = linedata.nextToken();
                                 title = linedata.nextToken();
                                 lastname = linedata.nextToken();
                                 firstname = linedata.nextToken();
                                 editor = linedata.nextToken();
-                                
-                                Author newauthor = new Author(firstname, lastname);
-                                newauthor.Insert();
-                                Editor neweditor = new Editor(editor);
-                                neweditor.Insert();
-                                Book newbook = new Book(title);
-                                newbook.set_author(newauthor.get_id());
-                                newbook.set_location(newlocation.get_id());
-                                newbook.set_editor(neweditor.get_id());
-                                newbook.Insert();
-                                ++loaded;
+                                if(location.isEmpty() || id.isEmpty() || title.isEmpty() || lastname.isEmpty() || firstname.isEmpty() || editor.isEmpty()) {
+                                    _logger.warn("Input data badly formatted for ID " + id + ". Empty fields");
+                                    System.out.println("\t" + line);
+                                    ++formaterrors;
+                                }
+                                else {
+                                    // Insert Data : 4 tables
+                                    if(newlocation == null) {   // 1st data line ? 
+                                        newlocation = new Location(location);
+                                        newlocation.Insert();
+                                    }
+                                    else {
+                                        if ( ! location.equals(newlocation.get_city())) {
+                                            newlocation = new Location(location);
+                                            newlocation.Insert();
+                                        }
+                                    }
+                                    
+                                    Author newauthor = new Author(firstname, lastname);
+                                    newauthor.Insert();
+                                    Editor neweditor = new Editor(editor);
+                                    neweditor.Insert();
+                                    Book newbook = new Book(title);
+                                    newbook.set_author(newauthor.get_id());
+                                    newbook.set_location(newlocation.get_id());
+                                    newbook.set_editor(neweditor.get_id());
+                                    newbook.Insert();
+                                    ++loaded;
+                                }
                             }
                             break;
                         }
@@ -336,7 +345,7 @@ public class Loader {
             if (args[loop].equals("-l")) {
                 if (loop < args.length) {
                     _maxlines = Integer.parseInt(args[++loop]);
-                    _logger.warn("Will read at most " + _maxlines + " file(s)");
+                    _logger.warn("Will read at most " + _maxlines + " line(s)");
                     recognized = true;
                 }
             }
