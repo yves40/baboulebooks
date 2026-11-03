@@ -2,5 +2,6 @@
 /lib
 /xml
 /build
+sql/*BACKUP*.sql
 
 
