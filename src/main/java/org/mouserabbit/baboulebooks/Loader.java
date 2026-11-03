@@ -12,7 +12,6 @@ import java.nio.file.*;
 import java.util.StringTokenizer;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.management.modelmbean.XMLParseException;
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -37,14 +36,14 @@ import org.mouserabbit.baboulebooks.classes.*;
  * @category Test
  * @version 1.01
  * 
- * babloader -u baboule -p Baboule40 -host localhost -port 3306 -d babouledb -x "D:\ALL\LAB\GIT\JAVA\baboulebooks\data\LivresPONTO.csv" -l 20
- * babloader -u baboule -p Baboule40 -host localhost -port 3306 -d babouledb -x "D:\ALL\LAB\GIT\JAVA\baboulebooks\data\LivresPONTO.csv" -l 20 -z
+ * babloader -u baboule -p Baboule40 -host localhost -port 3306 -d babouledb -x "D:\ALL\LAB\GIT\JAVA\baboulebooks\data\Livres-PONTO.csv" -l 20
+ * babloader -u baboule -p Baboule40 -host localhost -port 3306 -d babouledb -x "D:\ALL\LAB\GIT\JAVA\baboulebooks\data\Livres-PONTO.csv" -l 20 -z
  * babloader -h
  *  
  */
 public class Loader {
 
-    private static String version = "Loader, Oct 10 2025 : 1.51";
+    private static String version = "Loader, Oct 30 2026 : 1.52";
     private static String _host = "localhost";
     private static int _port = 3306;
     private static String _user = "";
@@ -135,11 +134,6 @@ public class Loader {
             e.printStackTrace();
             System.exit(1);
         } 
-        catch (XMLParseException x) {
-            _logger.error("An Exception occured  : " + x.getMessage());
-            System.exit(1);
-
-        }
         catch (Exception x) {
             _logger.error("An Exception occured  : " + x.getMessage());
             Usage();
@@ -402,7 +396,7 @@ public class Loader {
     </server>
 
      */
-    private static void analyzeXMLParameterFile() throws Exception, XMLParseException {
+    private static void analyzeXMLParameterFile() throws Exception {
         _logger.info("Processing XML parameter file : " + _xmlparameterfile);
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -442,7 +436,7 @@ public class Loader {
                                 _zerodata =  Boolean.valueOf(node.getTextContent());
                                 break;
                     default:
-                            throw new XMLParseException("XML parameter file invalid tag : [ " + node.getNodeName() + " ]");
+                            throw new Exception("XML parameter file invalid tag : [ " + node.getNodeName() + " ]");
                 }
             }
         }
